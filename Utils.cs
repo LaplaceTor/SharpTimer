@@ -138,7 +138,7 @@ namespace SharpTimer
 
         public double CalculatePoints(int timerTicks)
         {
-            double basePoints = 100.0;
+            double basePoints = 1000.0;
             double timeFactor = 0.0001;
             double tierMult = 0.1;
 
@@ -153,7 +153,7 @@ namespace SharpTimer
 
         public double CalculatePBPoints(int timerTicks)
         {
-            double basePoints = 100.0;
+            double basePoints = 1000.0;
             double timeFactor = 0.01;
             double tierMult = 0.1;
 
@@ -603,6 +603,8 @@ namespace SharpTimer
                 SharpTimerDebug("Executing SharpTimer/config");
                 Server.ExecuteCommand("sv_autoexec_mapname_cfg 0");
                 Server.ExecuteCommand($"execifexists SharpTimer/config.cfg");
+                Server.ExecuteCommand("sv_cheats 0");
+                Svcheats.SetValue(false);
 
                 //delay custom_exec so it executes after map exec
                 SharpTimerDebug("Creating custom_exec 1sec delay");

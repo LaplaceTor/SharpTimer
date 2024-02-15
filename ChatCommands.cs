@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
-using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 
@@ -61,7 +60,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -104,7 +103,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -173,32 +172,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
             string arg = command.ArgByIndex(1);
 
             _ = ReplayTop10SRHandler(player, arg);
-        }
-
-        public void AdminNoclipCommand(CCSPlayerController? player, CommandInfo command)
-        {
-            if (!IsAllowedPlayer(player)) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_noclip...");
-
-            playerTimers[player.Slot].IsNoclipEnabled = playerTimers[player.Slot].IsNoclipEnabled ? false : true;
-
-            if (playerTimers[player.Slot].IsNoclipEnabled)
-            {
-                player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
-                SharpTimerDebug($"MoveType set to MOVETYPE_WALK for {player.PlayerName}");
-            }
-            else
-            {
-                player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_NOCLIP;
-                SharpTimerDebug($"MoveType set to MOVETYPE_NOCLIP for {player.PlayerName}");
-            }
         }
 
         public async Task ReplayTop10SRHandler(CCSPlayerController player, string arg)
@@ -648,7 +628,7 @@ namespace SharpTimer
 
                 if (playerTimers[player.Slot].IsReplaying)
                 {
-                    player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                    player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                     return;
                 }
 
@@ -716,7 +696,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -783,7 +763,7 @@ namespace SharpTimer
 
                 if (playerTimers[player.Slot].IsReplaying)
                 {
-                    player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                    player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                     return;
                 }
 
@@ -857,7 +837,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -881,7 +861,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -1027,7 +1007,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -1049,6 +1029,60 @@ namespace SharpTimer
             if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos.Clear(); //remove previous stage times if the map has stages
             if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {beepSound}");
             SharpTimerDebug($"{player.PlayerName} css_timer to {playerTimers[player.Slot].IsTimerBlocked}");
+        }
+
+        [ConsoleCommand("css_noclip", "noclip")]
+        [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
+        public void PlayerNoclip(CCSPlayerController? player, CommandInfo command)
+        {
+            if (!IsAllowedPlayer(player)) return;
+            SharpTimerDebug($"{player.PlayerName} calling css_noclip...");
+
+            if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
+            {
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
+                return;
+            }
+
+            if (!playerTimers[player.Slot].IsTimerBlocked)
+            {
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!timer{ChatColors.White} 停止计时!");
+                return;
+            }
+
+            if (playerTimers[player.Slot].IsReplaying)
+            {
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
+                return;
+            }
+
+            playerTimers[player.Slot].TicksSinceLastCmd = 0;
+
+            // Remove checkpoints for the current player
+            // playerCheckpoints.Remove(player.Slot);
+
+            playerTimers[player.Slot].IsNoclipEnabled = playerTimers[player.Slot].IsNoclipEnabled ? false : true;
+            playerTimers[player.Slot].IsRecordingReplay = false;
+            player.PrintToChat(msgPrefix + $" NOCLIP飞行: {(playerTimers[player.Slot].IsTimerBlocked ? $"{ChatColors.Red} 关闭" : $"{ChatColors.Green} 打开")}");
+            playerTimers[player.Slot].IsTimerRunning = false;
+            playerTimers[player.Slot].TimerTicks = 0;
+            playerTimers[player.Slot].IsBonusTimerRunning = false;
+            playerTimers[player.Slot].BonusTimerTicks = 0;
+            SortedCachedRecords = GetSortedRecords();
+
+            if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {beepSound}");
+
+            if (playerTimers[player.Slot].IsNoclipEnabled)
+            {
+                player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+                SharpTimerDebug($"MoveType set to MOVETYPE_WALK for {player.PlayerName}");
+            }
+            else
+            {
+                player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_NOCLIP;
+                SharpTimerDebug($"MoveType set to MOVETYPE_NOCLIP for {player.PlayerName}");
+            }
+            SharpTimerDebug($"{player.PlayerName} css_noclip to {playerTimers[player.Slot].IsTimerBlocked}");
         }
 
         [ConsoleCommand("css_stver", "Prints SharpTimer Version")]
@@ -1091,7 +1125,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -1168,7 +1202,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -1235,7 +1269,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -1294,7 +1328,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 
@@ -1357,7 +1391,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!stopreplay{ChatColors.White} 停止回放!");
                 return;
             }
 

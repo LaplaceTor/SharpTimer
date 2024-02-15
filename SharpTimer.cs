@@ -36,6 +36,10 @@ namespace SharpTimer
 
             RegisterEventHandler<EventPlayerConnectFull>((@event, info) =>
             {
+                Server.ExecuteCommand("sv_cheats 0");
+                Svcheats.SetValue(false);
+                Server.ExecuteCommand("sv_hibernate_when_empty 0");
+
                 if (@event.Userid.IsValid)
                 {
                     var player = @event.Userid;
@@ -60,6 +64,10 @@ namespace SharpTimer
             {
                 var bot = @event.Userid;
 
+                Server.ExecuteCommand("sv_cheats 0");
+                Svcheats.SetValue(false);
+                Server.ExecuteCommand("sv_hibernate_when_empty 0");
+
                 if (bot.IsValid && bot.IsBot)
                 {
                     if (startKickingAllFuckingBotsExceptReplayOneIFuckingHateValveDogshitFuckingCompanySmile)
@@ -83,6 +91,9 @@ namespace SharpTimer
             {
                 LoadMapData();
                 SharpTimerDebug($"Loading MapData on RoundStart...");
+                Server.ExecuteCommand("sv_cheats 0");
+                Svcheats.SetValue(false);
+                Server.ExecuteCommand("sv_hibernate_when_empty 0");
                 return HookResult.Continue;
             });
 
@@ -91,6 +102,10 @@ namespace SharpTimer
                 if (@event.Userid == null) return HookResult.Continue;
 
                 var player = @event.Userid;
+
+                Server.ExecuteCommand("sv_cheats 0");
+                Svcheats.SetValue(false);
+                Server.ExecuteCommand("sv_hibernate_when_empty 0");
 
                 if (player.IsBot || !player.IsValid || player == null)
                 {

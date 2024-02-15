@@ -85,6 +85,9 @@ namespace SharpTimer
 
         private void OnPlayerConnect(CCSPlayerController? player, bool isForBot = false)
         {
+            Server.ExecuteCommand("sv_cheats 0");
+            Svcheats.SetValue(false);
+            Server.ExecuteCommand("sv_hibernate_when_empty 0");
             try
             {
                 if (player == null)
@@ -162,6 +165,10 @@ namespace SharpTimer
         {
             if (player == null) return;
 
+            Server.ExecuteCommand("sv_cheats 0");
+            Svcheats.SetValue(false);
+            Server.ExecuteCommand("sv_hibernate_when_empty 0");
+            
             try
             {
                 if (isForBot == true && connectedReplayBots.TryGetValue(player.Slot, out var connectedReplayBot))

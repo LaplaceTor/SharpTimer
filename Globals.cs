@@ -31,6 +31,7 @@ namespace SharpTimer
         public string startBeamColor = "";
         public string endBeamColor = "";
         public bool beamColorOverride = false;
+        public ConVar Svcheats = ConVar.Find("sv_cheats");
         public string currentMapStartTrigger = "trigger_startzone";
         public Vector? currentMapStartTriggerMaxs = null;
         public Vector? currentMapStartTriggerMins = null;
