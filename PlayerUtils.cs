@@ -261,6 +261,13 @@ namespace SharpTimer
                 {
                     if (player == null || !player.IsValid || player.Slot == null) continue;
 
+                    if(playerTimers[player.Slot].IsTimerRunning && player.Pawn.Value.MoveType == MoveType_t.MOVETYPE_NOCLIP)
+                    {
+                        player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+                        player.PrintToChat(msgPrefix + $"{ChatColors.LightRed} 禁止NOCLIP飞行");
+                        playerTimers[player.Slot].IsTimerRunning = false;
+                    }
+
                     if ((CsTeam)player.TeamNum == CsTeam.Spectator)
                     {
                         SpectatorOnTick(player);
@@ -1519,6 +1526,8 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player)) return;
 
+            if(player.Pawn.Value.MoveType == MoveType_t.MOVETYPE_NOCLIP) return;
+
             if (bonusX != 0)
             {
                 if (useTriggers) SharpTimerDebug($"Starting Bonus Timer for {player.PlayerName}");
@@ -1598,6 +1607,8 @@ namespace SharpTimer
             }
 
             if (useTriggers) SharpTimerDebug($"Stopping Timer for {player.PlayerName}");
+
+            if(player.Pawn.Value.MoveType == MoveType_t.MOVETYPE_NOCLIP) return;
 
             int currentTicks = playerTimers[player.Slot].TimerTicks;
 
