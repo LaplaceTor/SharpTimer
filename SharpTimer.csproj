@@ -14,12 +14,7 @@
   </Target>
 
   <ItemGroup>
+    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.166" />
     <PackageReference Include="Nexd.MySQL" Version="1.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="CounterStrikeSharp.API">
-      <HintPath>/path/to/CounterStrikeSharp.API.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>
