@@ -55,13 +55,13 @@ namespace SharpTimer
 
             if (!playerTimers[player.Slot].IsTimerBlocked)
             {
-                player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!timer{ChatColors.White} 停止计时!");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -98,13 +98,13 @@ namespace SharpTimer
 
             if (!playerTimers[player.Slot].IsTimerBlocked)
             {
-                player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!timer{ChatColors.White} 停止计时!");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -167,13 +167,13 @@ namespace SharpTimer
 
             if (!playerTimers[player.Slot].IsTimerBlocked)
             {
-                player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!timer{ChatColors.White} 停止计时!");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -320,7 +320,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -346,7 +346,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -373,7 +373,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -412,7 +412,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -430,7 +430,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -448,7 +448,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -520,7 +520,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -587,7 +587,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -642,13 +642,13 @@ namespace SharpTimer
 
                 if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
                 {
-                    player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                    player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                     return;
                 }
 
                 if (playerTimers[player.Slot].IsReplaying)
                 {
-                    player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                    player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                     return;
                 }
 
@@ -710,13 +710,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -777,13 +777,13 @@ namespace SharpTimer
 
                 if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
                 {
-                    player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                    player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                     return;
                 }
 
                 if (playerTimers[player.Slot].IsReplaying)
                 {
-                    player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                    player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                     return;
                 }
 
@@ -851,13 +851,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -875,13 +875,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -971,7 +971,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -1021,13 +1021,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -1065,7 +1065,7 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
@@ -1085,19 +1085,19 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
             if (!playerTimers[player.Slot].IsTimerBlocked)
             {
-                player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
+                player.PrintToChat(msgPrefix + $" 请先使用 {primaryChatColor}!timer{ChatColors.White} 停止计时!");
                 return;
             }
 
@@ -1162,13 +1162,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -1229,13 +1229,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -1288,13 +1288,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
@@ -1351,13 +1351,13 @@ namespace SharpTimer
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+                player.PrintToChat(msgPrefix + $" 指令冷却中，请稍等......");
                 return;
             }
 
             if (playerTimers[player.Slot].IsReplaying)
             {
-                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                player.PrintToChat(msgPrefix + $" 停止回放请使用 {primaryChatColor}!stopreplay");
                 return;
             }
 
