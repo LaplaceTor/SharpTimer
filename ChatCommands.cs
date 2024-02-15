@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 
@@ -179,6 +180,25 @@ namespace SharpTimer
             string arg = command.ArgByIndex(1);
 
             _ = ReplayTop10SRHandler(player, arg);
+        }
+
+        public void AdminNoclipCommand(CCSPlayerController? player, CommandInfo command)
+        {
+            if (!IsAllowedPlayer(player)) return;
+            SharpTimerDebug($"{player.PlayerName} calling css_noclip...");
+
+            playerTimers[player.Slot].IsNoclipEnabled = playerTimers[player.Slot].IsNoclipEnabled ? false : true;
+
+            if (playerTimers[player.Slot].IsNoclipEnabled)
+            {
+                player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_WALK;
+                SharpTimerDebug($"MoveType set to MOVETYPE_WALK for {player.PlayerName}");
+            }
+            else
+            {
+                player.Pawn.Value.MoveType = MoveType_t.MOVETYPE_NOCLIP;
+                SharpTimerDebug($"MoveType set to MOVETYPE_NOCLIP for {player.PlayerName}");
+            }
         }
 
         public async Task ReplayTop10SRHandler(CCSPlayerController player, string arg)
