@@ -368,6 +368,9 @@
     "kz_automata": {
         "Tier": 1
     },
+    "kz_grotto": {
+        "Tier": 2
+    },
     "bkz_blackrockshooter_vzp": {
         "Tier": 2
     },
@@ -536,7 +539,7 @@
     "kz_cheese": {
         "Tier": 2
     },
-    "kz_christmas_fix": {
+    "kz_christmas": {
         "Tier": 2
     },
     "kz_chunky_peanut_butter": {
@@ -620,7 +623,7 @@
     "kz_erbajerb": {
         "Tier": 2
     },
-    "kz_excavate_b": {
+    "kz_excavate": {
         "Tier": 2
     },
     "kz_experiment": {
@@ -2069,7 +2072,7 @@
     "kz_flabbergast": {
         "Tier": 4
     },
-    "kz_forgotten_fix": {
+    "kz_forgotten": {
         "Tier": 4
     },
     "kz_free_ahful": {
