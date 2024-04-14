@@ -121,6 +121,23 @@ namespace SharpTimer
             enableReplays = bool.TryParse(args, out bool enableReplaysValue) ? enableReplaysValue : args != "0" && enableReplays;
         }
 
+        [ConsoleCommand("sharptimer_replay_max_lenght", "The maximum lenght for a Replay to be saved in seconds. Anything longer will be discarded Default value: 300")]
+        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        public void SharpTimerReplayMaxLenghtConvar(CCSPlayerController? player, CommandInfo command)
+        {
+            string args = command.ArgString;
+
+            if (int.TryParse(args, out int mxLenght) && mxLenght > 0)
+            {
+                maxReplayFrames = (int)(mxLenght * 64);
+                SharpTimerConPrint($"SharpTimer max replay lenght set to {mxLenght} seconds.");
+            }
+            else
+            {
+                SharpTimerConPrint("Invalid max replay lenght value. Please provide a positive int.");
+            }
+        }
+
         [ConsoleCommand("sharptimer_replay_loop_bot_enabled", "Whether a looping Server Record bot should be spawned in or not (requires navmesh fix). Default value: false")]
         [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
         public void SharpTimerReplayBotConvar(CCSPlayerController? player, CommandInfo command)
@@ -405,6 +422,15 @@ namespace SharpTimer
             string args = command.ArgString;
 
             disableDamage = bool.TryParse(args, out bool disableDamageValue) ? disableDamageValue : args != "0" && disableDamage;
+        }
+
+        [ConsoleCommand("sharptimer_remove_damage_use_alt", "Whether a much simpler 'nodamage' method should be used or not. Default value: false")]
+        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        public void SharpTimerRemoveDamageAltConvar(CCSPlayerController? player, CommandInfo command)
+        {
+            string args = command.ArgString;
+
+            altDmgHook = bool.TryParse(args, out bool altDmgHookValue) ? altDmgHookValue : args != "0" && altDmgHook;
         }
 
         [ConsoleCommand("sharptimer_remove_collision", "Whether Player collision should be removed or not. Default value: true")]
