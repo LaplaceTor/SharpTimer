@@ -67,6 +67,7 @@ namespace SharpTimer
         public bool enableReplays = false;
         public bool enableSRreplayBot = false;
         public bool startKickingAllFuckingBotsExceptReplayOneIFuckingHateValveDogshitFuckingCompanySmile = false;
+        public int maxReplayFrames = 19200;
         public bool globalRanksEnabled = false;
         public bool globalRanksFreePointsEnabled = true;
         public int maxGlobalFreePoints = 20;
@@ -89,6 +90,7 @@ namespace SharpTimer
         public bool hideAllPlayers = false;
         public bool removeCollisionEnabled = true;
         public bool disableDamage = true;
+        public bool altDmgHook = false;
         public bool cpEnabled = false;
         public bool use2DSpeed = false;
         public bool removeCpRestrictEnabled = false;

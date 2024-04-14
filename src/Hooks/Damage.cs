@@ -15,7 +15,7 @@ namespace SharpTimer
             try
             {
                 SharpTimerDebug("Init Damage hook...");
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && disableDamage == true)
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && disableDamage == true && altDmgHook == false)
                 {
                     SharpTimerDebug("Trying to register Linux Damage hook...");
                     VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Hook(this.OnTakeDamage, HookMode.Pre);
@@ -55,9 +55,13 @@ namespace SharpTimer
 
         HookResult OnTakeDamage(DynamicHook h)
         {
-            CEntityInstance player = h.GetParam<CEntityInstance>(0);
+            var ent = h.GetParam<CEntityInstance>(0);
+            var info = h.GetParam<CTakeDamageInfo>(1);
 
-            if (player != null && disableDamage)
+            if (!ent.IsValid || !info.Attacker.IsValid)
+                return HookResult.Continue;
+
+            if (ent.DesignerName == "player" && info.Attacker.Value!.DesignerName == "player" && disableDamage)
                 return HookResult.Handled;
             else
                 return HookResult.Continue;
