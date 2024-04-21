@@ -52,7 +52,7 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || enableReplays == false) return;
 
-            if (!playerTimers[player.Slot].IsTimerBlocked)
+            if (!playerTimers[player!.Slot].IsTimerBlocked)
             {
                 player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
                 return;
@@ -84,8 +84,8 @@ namespace SharpTimer
             playerTimers[player.Slot].IsBonusTimerRunning = false;
             playerTimers[player.Slot].BonusTimerTicks = 0;
             playerReplays[player.Slot].CurrentPlaybackFrame = 0;
-            if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes.Clear(); //remove previous stage times if the map has stages
-            if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos.Clear(); //remove previous stage times if the map has stages
+            if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
+            if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
             player.PrintToChat(msgPrefix + $" Replaying your Personal Best, type {primaryChatColor}!stopreplay {ChatColors.White}to exit the replay");
         }
 
@@ -95,7 +95,7 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || enableReplays == false) return;
 
-            if (!playerTimers[player.Slot].IsTimerBlocked)
+            if (!playerTimers[player!.Slot].IsTimerBlocked)
             {
                 player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
                 return;
@@ -148,8 +148,8 @@ namespace SharpTimer
                 playerTimers[player.Slot].IsBonusTimerRunning = false;
                 playerTimers[player.Slot].BonusTimerTicks = 0;
                 playerReplays[player.Slot].CurrentPlaybackFrame = 0;
-                if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes.Clear(); //remove previous stage times if the map has stages
-                if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos.Clear(); //remove previous stage times if the map has stages
+                if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
+                if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
                 Server.NextFrame(() => player.PrintToChat(msgPrefix + $" Replaying the Server Map Record, type {primaryChatColor}!stopreplay {ChatColors.White}to exit the replay"));
             }
             else
@@ -164,7 +164,7 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || enableReplays == false) return;
 
-            if (!playerTimers[player.Slot].IsTimerBlocked)
+            if (!playerTimers[player!.Slot].IsTimerBlocked)
             {
                 player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
                 return;
@@ -221,8 +221,8 @@ namespace SharpTimer
                     playerTimers[player.Slot].IsBonusTimerRunning = false;
                     playerTimers[player.Slot].BonusTimerTicks = 0;
                     playerReplays[player.Slot].CurrentPlaybackFrame = 0;
-                    if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes.Clear(); //remove previous stage times if the map has stages
-                    if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos.Clear(); //remove previous stage times if the map has stages
+                    if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
+                    if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
                     Server.NextFrame(() => player.PrintToChat(msgPrefix + $" Replaying the Server Top {top10}, type {primaryChatColor}!stopreplay {ChatColors.White}to exit the replay"));
                 }
                 else
@@ -242,7 +242,7 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || enableReplays == false) return;
 
-            if (!playerTimers[player.Slot].IsTimerBlocked || !playerTimers[player.Slot].IsReplaying)
+            if (!playerTimers[player!.Slot].IsTimerBlocked || !playerTimers[player.Slot].IsReplaying)
             {
                 player.PrintToChat(msgPrefix + $" No Replay playing currently");
                 return;
@@ -252,7 +252,7 @@ namespace SharpTimer
             {
                 player.PrintToChat(msgPrefix + $" Ending Replay!");
                 playerTimers[player.Slot].IsReplaying = false;
-                if (player.PlayerPawn.Value.MoveType != MoveType_t.MOVETYPE_WALK || player.PlayerPawn.Value.ActualMoveType == MoveType_t.MOVETYPE_WALK) SetMoveType(player, MoveType_t.MOVETYPE_WALK);
+                if (player.PlayerPawn.Value!.MoveType != MoveType_t.MOVETYPE_WALK || player.PlayerPawn.Value.ActualMoveType == MoveType_t.MOVETYPE_WALK) SetMoveType(player, MoveType_t.MOVETYPE_WALK);
                 RespawnPlayerCommand(player, command);
                 playerReplays.Remove(player.Slot);
                 playerReplays[player.Slot] = new PlayerReplays();
@@ -261,8 +261,8 @@ namespace SharpTimer
                 playerTimers[player.Slot].IsBonusTimerRunning = false;
                 playerTimers[player.Slot].BonusTimerTicks = 0;
                 playerReplays[player.Slot].CurrentPlaybackFrame = 0;
-                if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes.Clear(); //remove previous stage times if the map has stages
-                if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos.Clear(); //remove previous stage times if the map has stages
+                if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
+                if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
             }
         }
 
@@ -276,7 +276,7 @@ namespace SharpTimer
                      return;
             }
 
-            PrintAllEnabledCommands(player);
+            PrintAllEnabledCommands(player!);
         }
 
         /* [ConsoleCommand("css_spec", "Moves you to Spectator")]
@@ -305,7 +305,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_hud...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_hud...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -336,7 +336,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_keys...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_keys...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -368,7 +368,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_sounds...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_sounds...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -400,7 +400,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_jumpstats...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_jumpstats...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -435,7 +435,7 @@ namespace SharpTimer
 
         public void SetFov(CCSPlayerController? player, int desiredFov, bool noMySql = false)
         {
-            player.DesiredFOV = (uint)desiredFov;
+            player!.DesiredFOV = (uint)desiredFov;
             Utilities.SetStateChanged(player, "CBasePlayerController", "m_iDesiredFOV");
 
             if (noMySql == false) playerTimers[player.Slot].PlayerFov = desiredFov;
@@ -455,7 +455,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_top...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_top...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -478,7 +478,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_points...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_points...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -501,7 +501,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_topbonus...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_topbonus...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -524,8 +524,8 @@ namespace SharpTimer
         public async Task PrintTopRecordsHandler(CCSPlayerController? player, int bonusX = 0)
         {
             if (!IsAllowedPlayer(player) || topEnabled == false) return;
-            SharpTimerDebug($"Handling !top for {player.PlayerName}");
-            string currentMapNamee = bonusX == 0 ? currentMapName : $"{currentMapName}_bonus{bonusX}";
+            SharpTimerDebug($"Handling !top for {player!.PlayerName}");
+            string currentMapNamee = bonusX == 0 ? currentMapName! : $"{currentMapName}_bonus{bonusX}";
             Dictionary<string, PlayerRecord> sortedRecords;
             if (useMySQL == true)
             {
@@ -554,7 +554,7 @@ namespace SharpTimer
 
             foreach (var kvp in sortedRecords.Take(10))
             {
-                string playerName = kvp.Value.PlayerName; // Get the player name from the dictionary value
+                string playerName = kvp.Value.PlayerName!; // Get the player name from the dictionary value
                 int timerTicks = kvp.Value.TimerTicks; // Get the timer ticks from the dictionary value
 
                 bool showReplays = false;
@@ -578,7 +578,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_rank...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_rank...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -614,7 +614,11 @@ namespace SharpTimer
                     serverPlacement = await GetPlayerServerPlacement(player, steamId, playerName, false, true, false);
                 }
 
+<<<<<<< Updated upstream
                 int pbTicks = useMySQL ? await GetPreviousPlayerRecordFromDatabase(player, steamId, currentMapName, playerName) : GetPreviousPlayerRecord(player);
+=======
+                int pbTicks = useDatabase ? await GetPreviousPlayerRecordFromDatabase(player, steamId, currentMapName!, playerName) : GetPreviousPlayerRecord(player);
+>>>>>>> Stashed changes
 
                 Server.NextFrame(() =>
                 {
@@ -624,7 +628,7 @@ namespace SharpTimer
                     playerTimers[playerSlot].CachedRank = ranking;
                     playerTimers[playerSlot].CachedMapPlacement = mapPlacement;
 
-                    if (displayScoreboardTags) AddScoreboardTagToPlayer(player, ranking);
+                    if (displayScoreboardTags) AddScoreboardTagToPlayer(player!, ranking);
                 });
 
                 if (!sendRankToHUD)
@@ -637,7 +641,7 @@ namespace SharpTimer
                         {
                             rankMessage += $" {ChatColors.Default}({primaryChatColor}{serverPoints}{ChatColors.Default}) [{primaryChatColor}{serverPlacement}{ChatColors.Default}]";
                         }
-                        player.PrintToChat(rankMessage);
+                        player!.PrintToChat(rankMessage);
                         if (pbTicks != 0)
                         {
                             player.PrintToChat($"{msgPrefix} Your current PB on {primaryChatColor}{currentMapName}{ChatColors.Default}: {primaryChatColor}{FormatTime(pbTicks)}{ChatColors.Default} [{primaryChatColor}{mapPlacement}{ChatColors.Default}]");
@@ -661,7 +665,7 @@ namespace SharpTimer
                      return;
             }
 
-            SharpTimerDebug($"{player.PlayerName} calling css_sr...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_sr...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -675,7 +679,7 @@ namespace SharpTimer
         public async Task SRCommandHandler(CCSPlayerController? player)
         {
             if (!IsAllowedPlayer(player) || rankEnabled == false) return;
-            SharpTimerDebug($"Handling !sr for {player.PlayerName}...");
+            SharpTimerDebug($"Handling !sr for {player!.PlayerName}...");
             Dictionary<string, PlayerRecord> sortedRecords;
             if (useMySQL == false)
             {
@@ -699,7 +703,7 @@ namespace SharpTimer
 
             foreach (var kvp in sortedRecords.Take(1))
             {
-                string playerName = kvp.Value.PlayerName; // Get the player name from the dictionary value
+                string playerName = kvp.Value.PlayerName!; // Get the player name from the dictionary value
                 int timerTicks = kvp.Value.TimerTicks; // Get the timer ticks from the dictionary value
                 Server.NextFrame(() =>
                 {
@@ -716,7 +720,7 @@ namespace SharpTimer
             try
             {
                 if (!IsAllowedPlayer(player) || respawnEnabled == false) return;
-                SharpTimerDebug($"{player.PlayerName} calling css_rb...");
+                SharpTimerDebug($"{player!.PlayerName} calling css_rb...");
 
                 if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
                 {
@@ -749,13 +753,13 @@ namespace SharpTimer
 
                 if (bonusRespawnPoses[bonusX] != null)
                 {
-                    if (bonusRespawnAngs.TryGetValue(bonusX, out QAngle bonusAng) && bonusAng != null)
+                    if (bonusRespawnAngs.TryGetValue(bonusX, out QAngle? bonusAng) && bonusAng != null)
                     {
-                        player.PlayerPawn.Value.Teleport(bonusRespawnPoses[bonusX], bonusRespawnAngs[bonusX], new Vector(0, 0, 0));
+                        player.PlayerPawn.Value!.Teleport(bonusRespawnPoses[bonusX]!, bonusRespawnAngs[bonusX]!, new Vector(0, 0, 0));
                     }
                     else
                     {
-                        player.PlayerPawn.Value.Teleport(bonusRespawnPoses[bonusX], new QAngle(player.PlayerPawn.Value.EyeAngles.X, player.PlayerPawn.Value.EyeAngles.Y, player.PlayerPawn.Value.EyeAngles.Z) ?? new QAngle(0, 0, 0), new Vector(0, 0, 0));
+                        player.PlayerPawn.Value!.Teleport(bonusRespawnPoses[bonusX]!, new QAngle(player.PlayerPawn.Value.EyeAngles.X, player.PlayerPawn.Value.EyeAngles.Y, player.PlayerPawn.Value.EyeAngles.Z) ?? new QAngle(0, 0, 0), new Vector(0, 0, 0));
                     }
                     SharpTimerDebug($"{player.PlayerName} css_rb {bonusX} to {bonusRespawnPoses[bonusX]}");
                 }
@@ -786,7 +790,7 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || respawnEnabled == false) return;
 
-            SharpTimerDebug($"{player.PlayerName} calling css_rank...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_rank...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -807,12 +811,12 @@ namespace SharpTimer
             }
 
             // Get the player's current position and rotation
-            Vector currentPosition = player.Pawn.Value.CBodyComponent?.SceneNode?.AbsOrigin ?? new Vector(0, 0, 0);
-            QAngle currentRotation = player.PlayerPawn.Value.EyeAngles ?? new QAngle(0, 0, 0);
+            Vector currentPosition = player.Pawn.Value!.CBodyComponent?.SceneNode?.AbsOrigin ?? new Vector(0, 0, 0);
+            QAngle currentRotation = player.PlayerPawn.Value!.EyeAngles ?? new QAngle(0, 0, 0);
 
             if (useTriggers == true)
             {
-                if (IsVectorInsideBox(currentPosition + new Vector(0, 0, 10), currentMapStartTriggerMaxs, currentMapStartTriggerMins))
+                if (IsVectorInsideBox(currentPosition + new Vector(0, 0, 10), currentMapStartTriggerMaxs!, currentMapStartTriggerMins!))
                 {
                     // Convert position and rotation to strings
                     string positionString = $"{currentPosition.X} {currentPosition.Y} {currentPosition.Z}";
@@ -853,7 +857,7 @@ namespace SharpTimer
             try
             {
                 if (!IsAllowedPlayer(player) || respawnEnabled == false) return;
-                SharpTimerDebug($"{player.PlayerName} calling css_stage...");
+                SharpTimerDebug($"{player!.PlayerName} calling css_stage...");
 
                 if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
                 {
@@ -898,9 +902,9 @@ namespace SharpTimer
 
                 if (jumpStatsEnabled) InvalidateJS(player.Slot);
 
-                if (stageTriggerPoses.TryGetValue(stageX, out Vector stagePos) && stagePos != null)
+                if (stageTriggerPoses.TryGetValue(stageX, out Vector? stagePos) && stagePos != null)
                 {
-                    player.PlayerPawn.Value.Teleport(stagePos, stageTriggerAngs[stageX] ?? player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
+                    player.PlayerPawn.Value!.Teleport(stagePos, stageTriggerAngs[stageX] ?? player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
                     SharpTimerDebug($"{player.PlayerName} css_stage {stageX} to {stagePos}");
                 }
                 else
@@ -929,7 +933,7 @@ namespace SharpTimer
         public void RespawnPlayerCommand(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || respawnEnabled == false) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_r...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_r...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -953,7 +957,7 @@ namespace SharpTimer
         public void EndPlayerCommand(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || respawnEndEnabled == false) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_end...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_end...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -981,7 +985,7 @@ namespace SharpTimer
             try
             {
                 // Remove checkpoints for the current player
-                if (!playerTimers[player.Slot].IsTimerBlocked)
+                if (!playerTimers[player!.Slot].IsTimerBlocked)
                 {
                     playerCheckpoints.Remove(player.Slot);
                 }
@@ -990,7 +994,7 @@ namespace SharpTimer
 
                 if (stageTriggerCount != 0 || cpTriggerCount != 0)//remove previous stage times if the map has stages
                 {
-                    playerTimers[player.Slot].StageTimes.Clear();
+                    playerTimers[player.Slot].StageTimes!.Clear();
                 }
 
                 if (toEnd == false)
@@ -999,11 +1003,11 @@ namespace SharpTimer
                     {
                         if (currentRespawnAng != null)
                         {
-                            player.PlayerPawn.Value.Teleport(currentRespawnPos, currentRespawnAng, new Vector(0, 0, 0));
+                            player.PlayerPawn.Value!.Teleport(currentRespawnPos, currentRespawnAng, new Vector(0, 0, 0));
                         }
                         else
                         {
-                            player.PlayerPawn.Value.Teleport(currentRespawnPos, player.PlayerPawn.Value.EyeAngles ?? new QAngle(0, 0, 0), new Vector(0, 0, 0));
+                            player.PlayerPawn.Value!.Teleport(currentRespawnPos, player.PlayerPawn.Value.EyeAngles ?? new QAngle(0, 0, 0), new Vector(0, 0, 0));
                         }
                         SharpTimerDebug($"{player.PlayerName} css_r to {currentRespawnPos}");
                     }
@@ -1011,7 +1015,7 @@ namespace SharpTimer
                     {
                         if (playerTimers[player.Slot].SetRespawnPos != null && playerTimers[player.Slot].SetRespawnAng != null)
                         {
-                            player.PlayerPawn.Value.Teleport(ParseVector(playerTimers[player.Slot].SetRespawnPos), ParseQAngle(playerTimers[player.Slot].SetRespawnAng), new Vector(0, 0, 0));
+                            player.PlayerPawn.Value!.Teleport(ParseVector(playerTimers[player.Slot].SetRespawnPos!), ParseQAngle(playerTimers[player.Slot].SetRespawnAng!), new Vector(0, 0, 0));
                         }
                         else
                         {
@@ -1023,7 +1027,7 @@ namespace SharpTimer
                 {
                     if (currentEndPos != null)
                     {
-                        player.PlayerPawn.Value.Teleport(currentEndPos, player.PlayerPawn.Value.EyeAngles ?? new QAngle(0, 0, 0), new Vector(0, 0, 0));
+                        player.PlayerPawn.Value!.Teleport(currentEndPos, player.PlayerPawn.Value.EyeAngles ?? new QAngle(0, 0, 0), new Vector(0, 0, 0));
                     }
                     else
                     {
@@ -1053,7 +1057,7 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player)) return;
 
-            if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
+            if (playerTimers[player!.Slot].TicksSinceLastCmd < cmdCooldown)
             {
                 player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
                 return;
@@ -1102,7 +1106,7 @@ namespace SharpTimer
         public void ForceStopTimer(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player)) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_timer...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_timer...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -1130,8 +1134,8 @@ namespace SharpTimer
             playerTimers[player.Slot].BonusTimerTicks = 0;
             SortedCachedRecords = GetSortedRecords();
 
-            if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes.Clear(); //remove previous stage times if the map has stages
-            if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos.Clear(); //remove previous stage times if the map has stages
+            if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
+            if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
             if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {beepSound}");
             SharpTimerDebug($"{player.PlayerName} css_timer to {playerTimers[player.Slot].IsTimerBlocked}");
         }
@@ -1148,7 +1152,7 @@ namespace SharpTimer
                 return;
             }
 
-            if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
+            if (playerTimers[player!.Slot].TicksSinceLastCmd < cmdCooldown)
             {
                 player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
                 return;
@@ -1166,7 +1170,7 @@ namespace SharpTimer
         public void GoToPlayer(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || goToEnabled == false) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_goto...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_goto...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -1190,7 +1194,7 @@ namespace SharpTimer
 
             var name = command.GetArg(1);
             bool isPlayerFound = false;
-            CCSPlayerController foundPlayer = null;
+            CCSPlayerController? foundPlayer = null;
 
 
             foreach (var playerEntry in connectedPlayers.Values)
@@ -1228,8 +1232,8 @@ namespace SharpTimer
                 if (player != null && IsAllowedPlayer(foundPlayer) && playerTimers[player.Slot].IsTimerBlocked)
                 {
                     if (jumpStatsEnabled) InvalidateJS(player.Slot);
-                    player.PlayerPawn.Value.Teleport(foundPlayer.Pawn.Value.CBodyComponent?.SceneNode?.AbsOrigin ?? new Vector(0, 0, 0),
-                        foundPlayer.PlayerPawn.Value.EyeAngles ?? new QAngle(0, 0, 0), new Vector(0, 0, 0));
+                    player.PlayerPawn.Value!.Teleport(foundPlayer.Pawn.Value!.CBodyComponent?.SceneNode?.AbsOrigin ?? new Vector(0, 0, 0),
+                        foundPlayer.PlayerPawn.Value!.EyeAngles ?? new QAngle(0, 0, 0), new Vector(0, 0, 0));
                     SharpTimerDebug($"{player.PlayerName} css_goto to {foundPlayer.Pawn.Value.CBodyComponent?.SceneNode?.AbsOrigin ?? new Vector(0, 0, 0)}");
                 }
             }
@@ -1244,7 +1248,7 @@ namespace SharpTimer
         public void SetPlayerCP(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || cpEnabled == false) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_cp...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_cp...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -1258,16 +1262,16 @@ namespace SharpTimer
                 return;
             }
 
-            if (((PlayerFlags)player.Pawn.Value.Flags & PlayerFlags.FL_ONGROUND) != PlayerFlags.FL_ONGROUND && removeCpRestrictEnabled == false)
+            if (((PlayerFlags)player.Pawn.Value!.Flags & PlayerFlags.FL_ONGROUND) != PlayerFlags.FL_ONGROUND && removeCpRestrictEnabled == false)
             {
-                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant set {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")} while in air");
+                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant set {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} while in air");
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {cpSoundAir}");
                 return;
             }
 
             if (cpOnlyWhenTimerStopped == true && playerTimers[player.Slot].IsTimerBlocked == false)
             {
-                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant set {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")} while timer is on, use {ChatColors.White}!timer");
+                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant set {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} while timer is on, use {ChatColors.White}!timer");
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {cpSoundAir}");
                 return;
             }
@@ -1276,7 +1280,7 @@ namespace SharpTimer
 
             // Get the player's current position and rotation
             Vector currentPosition = player.Pawn.Value.CBodyComponent?.SceneNode?.AbsOrigin ?? new Vector(0, 0, 0);
-            Vector currentSpeed = player.PlayerPawn.Value.AbsVelocity ?? new Vector(0, 0, 0);
+            Vector currentSpeed = player.PlayerPawn.Value!.AbsVelocity ?? new Vector(0, 0, 0);
             QAngle currentRotation = player.PlayerPawn.Value.EyeAngles ?? new QAngle(0, 0, 0);
 
             // Convert position and rotation to strings
@@ -1301,7 +1305,7 @@ namespace SharpTimer
             int checkpointCount = playerCheckpoints[player.Slot].Count;
 
             // Print the chat message with the checkpoint count
-            player.PrintToChat(msgPrefix + $"{(currentMapName.Contains("surf_") ? "Loc" : "Checkpoint")} set! {primaryChatColor}#{checkpointCount}");
+            player.PrintToChat(msgPrefix + $"{(currentMapName!.Contains("surf_") ? "Loc" : "Checkpoint")} set! {primaryChatColor}#{checkpointCount}");
             if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {cpSound}");
             SharpTimerDebug($"{player.PlayerName} css_cp to {checkpointCount} {positionString} {rotationString} {speedString}");
         }
@@ -1311,7 +1315,7 @@ namespace SharpTimer
         public void TpPlayerCP(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || cpEnabled == false) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_tp...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_tp...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -1327,7 +1331,7 @@ namespace SharpTimer
 
             if (cpOnlyWhenTimerStopped == true && playerTimers[player.Slot].IsTimerBlocked == false)
             {
-                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant use {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")} while timer is on, use {ChatColors.White}!timer");
+                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant use {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} while timer is on, use {ChatColors.White}!timer");
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {cpSoundAir}");
                 return;
             }
@@ -1337,7 +1341,7 @@ namespace SharpTimer
             // Check if the player has any checkpoints
             if (!playerCheckpoints.ContainsKey(player.Slot) || playerCheckpoints[player.Slot].Count == 0)
             {
-                player.PrintToChat(msgPrefix + $"No {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")} set!");
+                player.PrintToChat(msgPrefix + $"No {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} set!");
                 return;
             }
 
@@ -1354,16 +1358,16 @@ namespace SharpTimer
             // Teleport the player to the most recent checkpoint, including the saved rotation
             if (removeCpRestrictEnabled == true)
             {
-                player.PlayerPawn.Value.Teleport(position, rotation, speed);
+                player.PlayerPawn.Value!.Teleport(position, rotation, speed);
             }
             else
             {
-                player.PlayerPawn.Value.Teleport(position, rotation, new Vector(0, 0, 0));
+                player.PlayerPawn.Value!.Teleport(position, rotation, new Vector(0, 0, 0));
             }
 
             // Play a sound or provide feedback to the player
             if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {tpSound}");
-            player.PrintToChat(msgPrefix + $"Teleported to most recent {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")}!");
+            player.PrintToChat(msgPrefix + $"Teleported to most recent {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")}!");
             SharpTimerDebug($"{player.PlayerName} css_tp to {position} {rotation} {speed}");
         }
 
@@ -1372,7 +1376,7 @@ namespace SharpTimer
         public void TpPreviousCP(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || cpEnabled == false) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_prevcp...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_prevcp...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -1388,16 +1392,16 @@ namespace SharpTimer
 
             if (cpOnlyWhenTimerStopped == true && playerTimers[player.Slot].IsTimerBlocked == false)
             {
-                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant use {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")} while timer is on, use {ChatColors.White}!timer");
+                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant use {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} while timer is on, use {ChatColors.White}!timer");
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {cpSoundAir}");
                 return;
             }
 
             playerTimers[player.Slot].TicksSinceLastCmd = 0;
 
-            if (!playerCheckpoints.TryGetValue(player.Slot, out List<PlayerCheckpoint> checkpoints) || checkpoints.Count == 0)
+            if (!playerCheckpoints.TryGetValue(player.Slot, out List<PlayerCheckpoint>? checkpoints) || checkpoints.Count == 0)
             {
-                player.PrintToChat(msgPrefix + $"No {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")} set!");
+                player.PrintToChat(msgPrefix + $"No {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} set!");
                 return;
             }
 
@@ -1423,10 +1427,10 @@ namespace SharpTimer
                 QAngle rotation = ParseQAngle(previousCheckpoint.RotationString ?? "0 0 0");
 
                 // Teleport the player to the previous checkpoint, including the saved rotation
-                player.PlayerPawn.Value.Teleport(position, rotation, new Vector(0, 0, 0));
+                player.PlayerPawn.Value!.Teleport(position, rotation, new Vector(0, 0, 0));
                 // Play a sound or provide feedback to the player
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {tpSound}");
-                player.PrintToChat(msgPrefix + $"Teleported to the previous {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")}!");
+                player.PrintToChat(msgPrefix + $"Teleported to the previous {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")}!");
                 SharpTimerDebug($"{player.PlayerName} css_prevcp to {position} {rotation}");
             }
         }
@@ -1436,7 +1440,7 @@ namespace SharpTimer
         public void TpNextCP(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || cpEnabled == false) return;
-            SharpTimerDebug($"{player.PlayerName} calling css_nextcp...");
+            SharpTimerDebug($"{player!.PlayerName} calling css_nextcp...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -1452,16 +1456,16 @@ namespace SharpTimer
 
             if (cpOnlyWhenTimerStopped == true && playerTimers[player.Slot].IsTimerBlocked == false)
             {
-                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant use {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")} while timer is on, use {ChatColors.White}!timer");
+                player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant use {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} while timer is on, use {ChatColors.White}!timer");
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {cpSoundAir}");
                 return;
             }
 
             playerTimers[player.Slot].TicksSinceLastCmd = 0;
 
-            if (!playerCheckpoints.TryGetValue(player.Slot, out List<PlayerCheckpoint> checkpoints) || checkpoints.Count == 0)
+            if (!playerCheckpoints.TryGetValue(player.Slot, out List<PlayerCheckpoint>? checkpoints) || checkpoints.Count == 0)
             {
-                player.PrintToChat(msgPrefix + $"No {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")} set!");
+                player.PrintToChat(msgPrefix + $"No {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} set!");
                 return;
             }
 
@@ -1487,11 +1491,11 @@ namespace SharpTimer
                 QAngle rotation = ParseQAngle(nextCheckpoint.RotationString ?? "0 0 0");
 
                 // Teleport the player to the next checkpoint, including the saved rotation
-                player.PlayerPawn.Value.Teleport(position, rotation, new Vector(0, 0, 0));
+                player.PlayerPawn.Value!.Teleport(position, rotation, new Vector(0, 0, 0));
 
                 // Play a sound or provide feedback to the player
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {tpSound}");
-                player.PrintToChat(msgPrefix + $"Teleported to the next {(currentMapName.Contains("surf_") ? "loc" : "checkpoint")}!");
+                player.PrintToChat(msgPrefix + $"Teleported to the next {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")}!");
                 SharpTimerDebug($"{player.PlayerName} css_nextcp to {position} {rotation}");
             }
         }

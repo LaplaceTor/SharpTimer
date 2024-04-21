@@ -17,7 +17,7 @@ namespace SharpTimer
                      return;
             }
             
-            PrintAllEnabledCommands(player);
+            PrintAllEnabledCommands(player!);
         }
         
         [ConsoleCommand("css_saveloc", "alias for !cp")]
