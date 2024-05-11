@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Runtime.InteropServices;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
@@ -11,83 +10,93 @@ namespace SharpTimer
 {
     public partial class SharpTimer
     {
-        [ConsoleCommand("css_dp_timers", "Replay your last pb")]
+        [ConsoleCommand("css_dp_timers", "Prints playerTimers")]
         [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
         public void DeepPrintPlayerTimers(CCSPlayerController? player, CommandInfo command)
         {
-            Console.WriteLine("Printing Player Timers:");
+            SharpTimerConPrint("Printing Player Timers:");
             foreach (var kvp in playerTimers)
             {
-                Console.WriteLine($"PlayerSlot: {kvp.Key}");
+                SharpTimerConPrint($"PlayerSlot: {kvp.Key}");
                 foreach (var prop in typeof(PlayerTimerInfo).GetProperties())
                 {
                     var value = prop.GetValue(kvp.Value, null);
-                    Console.WriteLine($"  {prop.Name}: {value}");
+                    SharpTimerConPrint($"  {prop.Name}: {value}");
                     if (value is Dictionary<int, int> intIntDictionary)
                     {
-                        Console.WriteLine($"    {prop.Name}:");
+                        SharpTimerConPrint($"    {prop.Name}:");
                         foreach (var entry in intIntDictionary)
                         {
-                            Console.WriteLine($"      {entry.Key}: {entry.Value}");
+                            SharpTimerConPrint($"      {entry.Key}: {entry.Value}");
                         }
                     }
                     else if (value is Dictionary<int, string> intStringDictionary)
                     {
-                        Console.WriteLine($"    {prop.Name}:");
+                        SharpTimerConPrint($"    {prop.Name}:");
                         foreach (var entry in intStringDictionary)
                         {
-                            Console.WriteLine($"      {entry.Key}: {entry.Value}");
+                            SharpTimerConPrint($"      {entry.Key}: {entry.Value}");
                         }
                     }
                 }
 
-                Console.WriteLine();
+                SharpTimerConPrint(" ");
             }
-            Console.WriteLine("End of Player Timers");
+            SharpTimerConPrint("End of Player Timers");
         }
 
-        [ConsoleCommand("css_replaypb", "Replay your last pb")]
+        [ConsoleCommand("css_replay", "Replay command")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
-        public void ReplaySelfCommand(CCSPlayerController? player, CommandInfo command)
+        public void ReplayCommand(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || enableReplays == false) return;
 
-            if (!playerTimers[player!.Slot].IsTimerBlocked)
+            var playerSlot = player!.Slot;
+            var steamID = player.SteamID.ToString();
+            var playerName = player.PlayerName;
+
+            if (!playerTimers[playerSlot].IsTimerBlocked)
             {
                 player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
                 return;
             }
 
-            if (playerTimers[player.Slot].IsReplaying)
+            if (playerTimers[playerSlot].IsReplaying)
             {
                 player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
                 return;
             }
 
-            string fileName = $"{player.SteamID}_replay.json"; //dirty temp fix
-            string playerReplaysPath = Path.Join(gameDir, "csgo", "cfg", "SharpTimer", "PlayerReplayData", currentMapName, fileName);
-            if (!File.Exists(playerReplaysPath))
-            {
-                player.PrintToChat(msgPrefix + $" You dont have any saved PB replay yet!");
-                return;
-            }
+            player.PrintToChat(msgPrefix + $" Available replay cmds: {primaryChatColor}!replaypb{ChatColors.Default} | {primaryChatColor}!replaytop <1-10>{ChatColors.Default} | {primaryChatColor}!replaysr{ChatColors.Default}");
+            player.PrintToChat(msgPrefix + $" Replaying the Server Map Record, type {primaryChatColor}!stopreplay {ChatColors.White}to exit the replay");
 
-            playerReplays.Remove(player.Slot);
-            playerReplays[player.Slot] = new PlayerReplays();
-            ReadReplayFromJson(player, player.SteamID.ToString());
-
-            playerTimers[player.Slot].IsReplaying = playerTimers[player.Slot].IsReplaying ? false : true;
-            playerTimers[player.Slot].ReplayHUDString = $"{player.PlayerName} | {playerTimers[player.Slot].CachedPB}";
-
-            playerTimers[player.Slot].IsTimerRunning = false;
-            playerTimers[player.Slot].TimerTicks = 0;
-            playerTimers[player.Slot].IsBonusTimerRunning = false;
-            playerTimers[player.Slot].BonusTimerTicks = 0;
-            playerReplays[player.Slot].CurrentPlaybackFrame = 0;
-            if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
-            if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
-            player.PrintToChat(msgPrefix + $" Replaying your Personal Best, type {primaryChatColor}!stopreplay {ChatColors.White}to exit the replay");
+            _ = Task.Run(async () => await ReplayHandler(player, playerSlot, "1"));
         }
+
+        // [ConsoleCommand("css_replaypb", "Replay your last pb")]
+        // [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
+        // public void ReplaySelfCommand(CCSPlayerController? player, CommandInfo command)
+        // {
+        //     if (!IsAllowedPlayer(player) || enableReplays == false) return;
+
+        //     var playerSlot = player!.Slot;
+        //     var steamID = player.SteamID.ToString();
+        //     var playerName = player.PlayerName;
+
+        //     if (!playerTimers[playerSlot].IsTimerBlocked)
+        //     {
+        //         player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
+        //         return;
+        //     }
+
+        //     if (playerTimers[playerSlot].IsReplaying)
+        //     {
+        //         player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+        //         return;
+        //     }
+
+        //     _ = Task.Run(async () => await ReplayHandler(player, playerSlot, "self", steamID, playerName));
+        // }
 
         [ConsoleCommand("css_replaysr", "Replay server map record")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
@@ -95,67 +104,21 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || enableReplays == false) return;
 
-            if (!playerTimers[player!.Slot].IsTimerBlocked)
+            var playerSlot = player!.Slot;
+
+            if (!playerTimers[playerSlot].IsTimerBlocked)
             {
                 player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
                 return;
             }
 
-            if (playerTimers[player.Slot].IsReplaying)
+            if (playerTimers[playerSlot].IsReplaying)
             {
                 player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
                 return;
             }
 
-            _ = ReplaySRHandler(player);
-        }
-
-        public async Task ReplaySRHandler(CCSPlayerController player)
-        {
-            playerReplays.Remove(player.Slot);
-            playerReplays[player.Slot] = new PlayerReplays();
-
-            var (srSteamID, srPlayerName, srTime) = ("null", "null", "null");
-
-            if (useMySQL)
-            {
-                (srSteamID, srPlayerName, srTime) = await GetMapRecordSteamIDFromDatabase();
-            }
-            else
-            {
-                (srSteamID, srPlayerName, srTime) = GetMapRecordSteamID();
-            }
-
-            if (IsAllowedPlayer(player))
-            {
-                if (srSteamID == "null" || srPlayerName == "null" || srTime == "null")
-                {
-                    Server.NextFrame(() => player.PrintToChat(msgPrefix + $"No Server Record to replay!"));
-                    return;
-                }
-
-                ReadReplayFromJson(player, srSteamID);
-
-                if (!playerReplays[player.Slot].replayFrames.Any()) return;
-
-                if (useMySQL) _ = GetReplayVIPGif(srSteamID, player.Slot);
-
-                playerTimers[player.Slot].IsReplaying = playerTimers[player.Slot].IsReplaying ? false : true;
-                playerTimers[player.Slot].ReplayHUDString = $"{srPlayerName} | {srTime}";
-
-                playerTimers[player.Slot].IsTimerRunning = false;
-                playerTimers[player.Slot].TimerTicks = 0;
-                playerTimers[player.Slot].IsBonusTimerRunning = false;
-                playerTimers[player.Slot].BonusTimerTicks = 0;
-                playerReplays[player.Slot].CurrentPlaybackFrame = 0;
-                if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
-                if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
-                Server.NextFrame(() => player.PrintToChat(msgPrefix + $" Replaying the Server Map Record, type {primaryChatColor}!stopreplay {ChatColors.White}to exit the replay"));
-            }
-            else
-            {
-                SharpTimerError($"Error in ReplaySRHandler: player not allowed or not on server anymore");
-            }
+            _ = Task.Run(async () => await ReplayHandler(player, playerSlot));
         }
 
         [ConsoleCommand("css_replaytop", "Replay a top 10 server map record")]
@@ -164,13 +127,15 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || enableReplays == false) return;
 
-            if (!playerTimers[player!.Slot].IsTimerBlocked)
+            var playerSlot = player!.Slot;
+
+            if (!playerTimers[playerSlot].IsTimerBlocked)
             {
                 player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
                 return;
             }
 
-            if (playerTimers[player.Slot].IsReplaying)
+            if (playerTimers[playerSlot].IsReplaying)
             {
                 player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
                 return;
@@ -178,61 +143,125 @@ namespace SharpTimer
 
             string arg = command.ArgByIndex(1);
 
-            _ = ReplayTop10SRHandler(player, arg);
+            _ = Task.Run(async () => await ReplayHandler(player, playerSlot, arg));
         }
 
-        public async Task ReplayTop10SRHandler(CCSPlayerController player, string arg)
+        [ConsoleCommand("css_replaybonus", "Replay a top 10 server bonus record")]
+        [CommandHelper(minArgs: 1, usage: "[1-10] [bonus stage]", whoCanExecute: CommandUsage.CLIENT_ONLY)]
+        public void ReplayBonusCommand(CCSPlayerController? player, CommandInfo command)
         {
-            if (int.TryParse(arg, out int top10) && top10 > 0 && top10 <= 10)
+            if (!IsAllowedPlayer(player) || enableReplays == false) return;
+
+            var playerSlot = player!.Slot;
+
+            if (!playerTimers[playerSlot].IsTimerBlocked)
             {
-                playerReplays.Remove(player.Slot);
-                playerReplays[player.Slot] = new PlayerReplays();
+                player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
+                return;
+            }
 
-                var (srSteamID, srPlayerName, srTime) = ("null", "null", "null");
+            if (playerTimers[playerSlot].IsReplaying)
+            {
+                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                return;
+            }
 
+            string arg = command.ArgByIndex(1);
+            string arg2 = command.ArgByIndex(2);
+
+            _ = Task.Run(async () => await ReplayHandler(player, playerSlot, arg, "69", "unknown", Int16.Parse(arg2)));
+        }
+
+        // [ConsoleCommand("css_replaybonuspb", "Replay your bonus pb")]
+        // [CommandHelper(minArgs: 1, usage: "[bonus stage]", whoCanExecute: CommandUsage.CLIENT_ONLY)]
+        // public void ReplayBonusPBCommand(CCSPlayerController? player, CommandInfo command)
+        // {
+        //     if (!IsAllowedPlayer(player) || enableReplays == false) return;
+
+        //     var playerSlot = player!.Slot;
+        //     var steamID = player.SteamID.ToString();
+        //     var playerName = player.PlayerName;
+
+        //     if (!playerTimers[playerSlot].IsTimerBlocked)
+        //     {
+        //         player.PrintToChat(msgPrefix + $" Please stop your timer using {primaryChatColor}!timer{ChatColors.White} first!");
+        //         return;
+        //     }
+
+        //     if (playerTimers[playerSlot].IsReplaying)
+        //     {
+        //         player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+        //         return;
+        //     }
+
+        //     string arg = command.ArgByIndex(1);
+        //     int bonusX = Int16.Parse(arg);
+
+        //     _ = Task.Run(async () => await ReplayHandler(player, playerSlot, "self", steamID, playerName, bonusX));
+        // }
+
+        public async Task ReplayHandler(CCSPlayerController player, int playerSlot, string arg = "1", string pbSteamID = "69", string playerName = "unknown", int bonusX = 0)
+        {
+            bool self = false;
+
+            int top10 = 1;
+            if (arg != "self" && (!int.TryParse(arg, out top10) || top10 <= 0 || top10 > 10))
+            {
+                top10 = 1;
+            }
+            else if (arg == "self")
+            {
+                self = true;
+            }
+
+            playerReplays.Remove(playerSlot);
+            playerReplays[playerSlot] = new PlayerReplays();
+
+            var (srSteamID, srPlayerName, srTime) = ("null", "null", "null");
+
+            if (!self)
+            {
                 if (useMySQL)
                 {
                     (srSteamID, srPlayerName, srTime) = await GetMapRecordSteamIDFromDatabase(0, top10);
                 }
                 else
                 {
-                    (srSteamID, srPlayerName, srTime) = GetMapRecordSteamID();
+                    (srSteamID, srPlayerName, srTime) = await GetMapRecordSteamID();
                 }
+            }
 
-                if (IsAllowedPlayer(player))
-                {
-                    if (srSteamID == "null" || srPlayerName == "null" || srTime == "null")
-                    {
-                        Server.NextFrame(() => player.PrintToChat(msgPrefix + $"No Server Record to replay!"));
-                        return;
-                    }
 
-                    ReadReplayFromJson(player, srSteamID);
+            if ((srSteamID == "null" || srPlayerName == "null" || srTime == "null") && !self)
+            {
+                Server.NextFrame(() => player.PrintToChat(msgPrefix + $"No Server Record to replay!"));
+                return;
+            }
 
-                    if (!playerReplays[player.Slot].replayFrames.Any()) return;
+            await ReadReplayFromJson(player, !self ? srSteamID : pbSteamID, playerSlot, bonusX);
 
-                    if (useMySQL) _ = GetReplayVIPGif(srSteamID, player.Slot);
+            if (playerReplays[playerSlot].replayFrames.Count == 0) return;
 
-                    playerTimers[player.Slot].IsReplaying = playerTimers[player.Slot].IsReplaying ? false : true;
-                    playerTimers[player.Slot].ReplayHUDString = $"{srPlayerName} | {srTime}";
+            if (useMySQL) await GetReplayVIPGif(!self ? srSteamID : pbSteamID, playerSlot);
 
-                    playerTimers[player.Slot].IsTimerRunning = false;
-                    playerTimers[player.Slot].TimerTicks = 0;
-                    playerTimers[player.Slot].IsBonusTimerRunning = false;
-                    playerTimers[player.Slot].BonusTimerTicks = 0;
-                    playerReplays[player.Slot].CurrentPlaybackFrame = 0;
-                    if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
-                    if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
-                    Server.NextFrame(() => player.PrintToChat(msgPrefix + $" Replaying the Server Top {top10}, type {primaryChatColor}!stopreplay {ChatColors.White}to exit the replay"));
-                }
-                else
-                {
-                    SharpTimerError($"Error in ReplaySRHandler: player not allowed or not on server anymore");
-                }
+            playerTimers[playerSlot].IsReplaying = !playerTimers[playerSlot].IsReplaying;
+            playerTimers[playerSlot].ReplayHUDString = !self ? $"{srPlayerName} | {srTime}" : $"{playerName} | {playerTimers[playerSlot].CachedPB}";
+
+            playerTimers[playerSlot].IsTimerRunning = false;
+            playerTimers[playerSlot].TimerTicks = 0;
+            playerTimers[playerSlot].IsBonusTimerRunning = false;
+            playerTimers[playerSlot].BonusTimerTicks = 0;
+            playerReplays[playerSlot].CurrentPlaybackFrame = 0;
+            if (stageTriggers.Count != 0) playerTimers[playerSlot].StageTimes!.Clear(); //remove previous stage times if the map has stages
+            if (stageTriggers.Count != 0) playerTimers[playerSlot].StageVelos!.Clear(); //remove previous stage times if the map has stages
+
+            if (IsAllowedPlayer(player))
+            {
+                Server.NextFrame(() => player.PrintToChat(msgPrefix + $" Replaying {(!self ? "the Server Top" + top10 : "your PB")}, type {primaryChatColor}!stopreplay {ChatColors.White}to exit the replay"));
             }
             else
             {
-                Server.NextFrame(() => player.PrintToChat(msgPrefix + $"Please enter a valid top 10 replay!"));
+                SharpTimerError($"Error in ReplayHandler: player not allowed or not on server anymore");
             }
         }
 
@@ -242,38 +271,41 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || enableReplays == false) return;
 
-            if (!playerTimers[player!.Slot].IsTimerBlocked || !playerTimers[player.Slot].IsReplaying)
+            var playerSlot = player!.Slot;
+
+            if (!playerTimers[playerSlot].IsTimerBlocked || !playerTimers[playerSlot].IsReplaying)
             {
                 player.PrintToChat(msgPrefix + $" No Replay playing currently");
                 return;
             }
 
-            if (playerTimers[player.Slot].IsReplaying)
+            if (playerTimers[playerSlot].IsReplaying)
             {
                 player.PrintToChat(msgPrefix + $" Ending Replay!");
-                playerTimers[player.Slot].IsReplaying = false;
+                playerTimers[playerSlot].IsReplaying = false;
                 if (player.PlayerPawn.Value!.MoveType != MoveType_t.MOVETYPE_WALK || player.PlayerPawn.Value.ActualMoveType == MoveType_t.MOVETYPE_WALK) SetMoveType(player, MoveType_t.MOVETYPE_WALK);
                 RespawnPlayerCommand(player, command);
-                playerReplays.Remove(player.Slot);
-                playerReplays[player.Slot] = new PlayerReplays();
-                playerTimers[player.Slot].IsTimerRunning = false;
-                playerTimers[player.Slot].TimerTicks = 0;
-                playerTimers[player.Slot].IsBonusTimerRunning = false;
-                playerTimers[player.Slot].BonusTimerTicks = 0;
-                playerReplays[player.Slot].CurrentPlaybackFrame = 0;
-                if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
-                if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
+                playerReplays.Remove(playerSlot);
+                playerReplays[playerSlot] = new PlayerReplays();
+                playerTimers[playerSlot].IsTimerRunning = false;
+                playerTimers[playerSlot].TimerTicks = 0;
+                playerTimers[playerSlot].IsBonusTimerRunning = false;
+                playerTimers[playerSlot].BonusTimerTicks = 0;
+                playerReplays[playerSlot].CurrentPlaybackFrame = 0;
+                if (stageTriggers.Count != 0) playerTimers[playerSlot].StageTimes!.Clear(); //remove previous stage times if the map has stages
+                if (stageTriggers.Count != 0) playerTimers[playerSlot].StageVelos!.Clear(); //remove previous stage times if the map has stages
             }
         }
 
+        [ConsoleCommand("css_help", "alias for !sthelp")]
         [ConsoleCommand("css_sthelp", "Prints all commands for the player")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
         public void HelpCommand(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || !helpEnabled)
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
             PrintAllEnabledCommands(player!);
@@ -301,28 +333,32 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player))
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
-            SharpTimerDebug($"{player!.PlayerName} calling css_hud...");
+            var playerName = player!.PlayerName;
+            var playerSlot = player.Slot;
+            var steamID = player.SteamID.ToString();
 
-            if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
+            SharpTimerDebug($"{playerName} calling css_hud...");
+
+            if (playerTimers[playerSlot].TicksSinceLastCmd < cmdCooldown)
             {
                 player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
                 return;
             }
 
-            playerTimers[player.Slot].TicksSinceLastCmd = 0;
+            playerTimers[playerSlot].TicksSinceLastCmd = 0;
 
-            playerTimers[player.Slot].HideTimerHud = !playerTimers[player.Slot].HideTimerHud;
+            playerTimers[playerSlot].HideTimerHud = !playerTimers[playerSlot].HideTimerHud;
 
-            player.PrintToChat(msgPrefix + $" Hud is now: {(playerTimers[player.Slot].HideTimerHud ? $"{ChatColors.Red} Hidden" : $"{ChatColors.Green} Shown")}");
-            SharpTimerDebug($"Hide Timer HUD set to: {playerTimers[player.Slot].HideTimerHud} for {player.PlayerName}");
+            player.PrintToChat(msgPrefix + $" Hud is now: {(playerTimers[playerSlot].HideTimerHud ? $"{ChatColors.Red} Hidden" : $"{ChatColors.Green} Shown")}");
+            SharpTimerDebug($"Hide Timer HUD set to: {playerTimers[playerSlot].HideTimerHud} for {playerName}");
 
             if (useMySQL == true)
             {
-                _ = SetPlayerStats(player, player.SteamID.ToString(), player.PlayerName, player.Slot);
+                _ = Task.Run(async () => await SetPlayerStats(player, steamID, playerName, playerSlot));
             }
         }
 
@@ -332,28 +368,32 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player))
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
-            SharpTimerDebug($"{player!.PlayerName} calling css_keys...");
+            var playerName = player!.PlayerName;
+            var playerSlot = player.Slot;
+            var steamID = player.SteamID.ToString();
 
-            if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
+            SharpTimerDebug($"{playerName} calling css_keys...");
+
+            if (playerTimers[playerSlot].TicksSinceLastCmd < cmdCooldown)
             {
                 player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
                 return;
             }
 
-            playerTimers[player.Slot].TicksSinceLastCmd = 0;
+            playerTimers[playerSlot].TicksSinceLastCmd = 0;
 
-            playerTimers[player.Slot].HideKeys = playerTimers[player.Slot].HideKeys ? false : true;
+            playerTimers[playerSlot].HideKeys = playerTimers[playerSlot].HideKeys ? false : true;
 
-            player.PrintToChat(msgPrefix + $" Keys are now: {(playerTimers[player.Slot].HideKeys ? $"{ChatColors.Red} Hidden" : $"{ChatColors.Green} Shown")}");
-            SharpTimerDebug($"Hide Timer HUD set to: {playerTimers[player.Slot].HideKeys} for {player.PlayerName}");
+            player.PrintToChat(msgPrefix + $" Keys are now: {(playerTimers[playerSlot].HideKeys ? $"{ChatColors.Red} Hidden" : $"{ChatColors.Green} Shown")}");
+            SharpTimerDebug($"Hide Timer HUD set to: {playerTimers[playerSlot].HideKeys} for {playerName}");
 
             if (useMySQL == true)
             {
-                _ = SetPlayerStats(player, player.SteamID.ToString(), player.PlayerName, player.Slot);
+                _ = Task.Run(async () => await SetPlayerStats(player, steamID, playerName, playerSlot));
             }
 
         }
@@ -364,63 +404,70 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player))
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
-            SharpTimerDebug($"{player!.PlayerName} calling css_sounds...");
+            var playerName = player!.PlayerName;
+            var playerSlot = player.Slot;
+            var steamID = player.SteamID.ToString();
 
-            if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
+            SharpTimerDebug($"{playerName} calling css_sounds...");
+
+            if (playerTimers[playerSlot].TicksSinceLastCmd < cmdCooldown)
             {
                 player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
                 return;
             }
 
-            playerTimers[player.Slot].TicksSinceLastCmd = 0;
+            playerTimers[playerSlot].TicksSinceLastCmd = 0;
 
-            playerTimers[player.Slot].SoundsEnabled = playerTimers[player.Slot].SoundsEnabled ? false : true;
+            playerTimers[playerSlot].SoundsEnabled = playerTimers[playerSlot].SoundsEnabled ? false : true;
 
-            player.PrintToChat(msgPrefix + $"Sounds are now:{(playerTimers[player.Slot].SoundsEnabled ? $"{ChatColors.Green} ON" : $"{ChatColors.Red} OFF")}");
-            SharpTimerDebug($"Timer Sounds set to: {playerTimers[player.Slot].SoundsEnabled} for {player.PlayerName}");
-
-            if (useMySQL == true)
-            {
-                _ = SetPlayerStats(player, player.SteamID.ToString(), player.PlayerName, player.Slot);
-            }
-
-        }
-
-        [ConsoleCommand("css_jumpstats", "Toggles JumpStats")]
-        [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
-        public void JSSwitchCommand(CCSPlayerController? player, CommandInfo command)
-        {
-            if (!IsAllowedPlayer(player) || jumpStatsEnabled == false)
-            {
-                if(!IsAllowedSpectator(player))
-                     return;
-            }
-
-            SharpTimerDebug($"{player!.PlayerName} calling css_jumpstats...");
-
-            if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
-            {
-                player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
-                return;
-            }
-
-            playerTimers[player.Slot].TicksSinceLastCmd = 0;
-
-            playerTimers[player.Slot].HideJumpStats = playerTimers[player.Slot].HideJumpStats ? false : true;
-
-            player.PrintToChat(msgPrefix + $"Jump Stats are now:{(playerTimers[player.Slot].HideJumpStats ? $"{ChatColors.Red} Hidden" : $"{ChatColors.Green} Shown")}");
-            SharpTimerDebug($"Hide Jump Stats set to: {playerTimers[player.Slot].HideJumpStats} for {player.PlayerName}");
+            player.PrintToChat(msgPrefix + $"Sounds are now:{(playerTimers[playerSlot].SoundsEnabled ? $"{ChatColors.Green} ON" : $"{ChatColors.Red} OFF")}");
+            SharpTimerDebug($"Timer Sounds set to: {playerTimers[playerSlot].SoundsEnabled} for {playerName}");
 
             if (useMySQL == true)
             {
-                _ = SetPlayerStats(player, player.SteamID.ToString(), player.PlayerName, player.Slot);
+                _ = Task.Run(async () => await SetPlayerStats(player, steamID, playerName, playerSlot));
             }
-
         }
+
+        // [ConsoleCommand("css_jumpstats", "Toggles JumpStats")]
+        // [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
+        // public void JSSwitchCommand(CCSPlayerController? player, CommandInfo command)
+        // {
+        //     if (!IsAllowedPlayer(player) || jumpStatsEnabled == false)
+        //     {
+        //         if (!IsAllowedSpectator(player))
+        //             return;
+        //     }
+
+        //     var playerName = player!.PlayerName;
+        //     var playerSlot = player.Slot;
+        //     var steamID = player.SteamID.ToString();
+
+        //     SharpTimerDebug($"{playerName} calling css_jumpstats...");
+
+        //     if (playerTimers[playerSlot].TicksSinceLastCmd < cmdCooldown)
+        //     {
+        //         player.PrintToChat(msgPrefix + $" Command is on cooldown. Chill...");
+        //         return;
+        //     }
+
+        //     playerTimers[playerSlot].TicksSinceLastCmd = 0;
+
+        //     playerTimers[playerSlot].HideJumpStats = playerTimers[playerSlot].HideJumpStats ? false : true;
+
+        //     player.PrintToChat(msgPrefix + $"Jump Stats are now:{(playerTimers[playerSlot].HideJumpStats ? $"{ChatColors.Red} Hidden" : $"{ChatColors.Green} Shown")}");
+        //     SharpTimerDebug($"Hide Jump Stats set to: {playerTimers[playerSlot].HideJumpStats} for {playerName}");
+
+        //     if (useMySQL == true)
+        //     {
+        //         _ = Task.Run(async () => await SetPlayerStats(player, steamID, playerName, playerSlot));
+        //     }
+
+        // }
 
         [ConsoleCommand("css_fov", "Sets the player's FOV")]
         [CommandHelper(minArgs: 1, usage: "[fov]")]
@@ -438,24 +485,31 @@ namespace SharpTimer
             player!.DesiredFOV = (uint)desiredFov;
             Utilities.SetStateChanged(player, "CBasePlayerController", "m_iDesiredFOV");
 
+            var playerName = player.PlayerName;
+            var playerSlot = player.Slot;
+            var steamID = player.SteamID.ToString();
+
             if (noMySql == false) playerTimers[player.Slot].PlayerFov = desiredFov;
             if (useMySQL == true && noMySql == false)
             {
-                _ = SetPlayerStats(player, player.SteamID.ToString(), player.PlayerName, player.Slot);
+                _ = Task.Run(async () => await SetPlayerStats(player, steamID, playerName, playerSlot));
             }
         }
 
         [ConsoleCommand("css_top", "Prints top players of this map")]
+        [ConsoleCommand("css_mtop", "alias for !top")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
         public void PrintTopRecords(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || topEnabled == false)
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
-            SharpTimerDebug($"{player!.PlayerName} calling css_top...");
+            var playerName = player!.PlayerName;
+
+            SharpTimerDebug($"{playerName} calling css_top...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -465,7 +519,9 @@ namespace SharpTimer
 
             playerTimers[player.Slot].TicksSinceLastCmd = 0;
 
-            _ = PrintTopRecordsHandler(player);
+            var mapName = command.ArgByIndex(1);
+
+            _ = Task.Run(async () => await PrintTopRecordsHandler(player, playerName, 0, string.IsNullOrEmpty(mapName) ? "" : mapName));
         }
 
         [ConsoleCommand("css_points", "Prints top points")]
@@ -474,11 +530,13 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || globalRanksEnabled == false)
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
-            SharpTimerDebug($"{player!.PlayerName} calling css_points...");
+            var playerName = player!.PlayerName;
+
+            SharpTimerDebug($"{playerName} calling css_points...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -488,20 +546,23 @@ namespace SharpTimer
 
             playerTimers[player.Slot].TicksSinceLastCmd = 0;
 
-            _ = PrintTop10PlayerPoints(player);
+            _ = Task.Run(async () => await PrintTop10PlayerPoints(player));
         }
 
         [ConsoleCommand("css_topbonus", "Prints top players of this map bonus")]
+        [ConsoleCommand("css_btop", "alias for !topbonus")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
         public void PrintTopBonusRecords(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || topEnabled == false)
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
-            SharpTimerDebug($"{player!.PlayerName} calling css_topbonus...");
+            var playerName = player!.PlayerName;
+
+            SharpTimerDebug($"{playerName} calling css_topbonus...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -518,54 +579,65 @@ namespace SharpTimer
                 return;
             }
 
-            _ = PrintTopRecordsHandler(player, bonusX);
+            _ = Task.Run(async () => await PrintTopRecordsHandler(player, playerName, bonusX));
         }
 
-        public async Task PrintTopRecordsHandler(CCSPlayerController? player, int bonusX = 0)
+        public async Task PrintTopRecordsHandler(CCSPlayerController? player, string playerName, int bonusX = 0, string mapName = "")
         {
             if (!IsAllowedPlayer(player) || topEnabled == false) return;
-            SharpTimerDebug($"Handling !top for {player!.PlayerName}");
-            string currentMapNamee = bonusX == 0 ? currentMapName! : $"{currentMapName}_bonus{bonusX}";
+            SharpTimerDebug($"Handling !top for {playerName}");
+
+            string? currentMapNamee;
+            if (string.IsNullOrEmpty(mapName))
+                currentMapNamee = bonusX == 0 ? currentMapName! : $"{currentMapName}_bonus{bonusX}";
+            else
+                currentMapNamee = mapName;
+
             Dictionary<string, PlayerRecord> sortedRecords;
             if (useMySQL == true)
             {
-                sortedRecords = await GetSortedRecordsFromDatabase(bonusX);
+                sortedRecords = await GetSortedRecordsFromDatabase(10, bonusX, mapName);
             }
             else
             {
-                sortedRecords = GetSortedRecords(bonusX);
+                sortedRecords = await GetSortedRecords(bonusX, mapName);
             }
 
             if (sortedRecords.Count == 0)
             {
                 Server.NextFrame(() =>
                 {
-                    if (IsAllowedPlayer(player)) player.PrintToChat(msgPrefix + $" No records available for{(bonusX != 0 ? $" Bonus {bonusX} on" : "")} {currentMapName}.");
+                    if (IsAllowedPlayer(player)) player!.PrintToChat(msgPrefix + $" No records available for{(bonusX != 0 ? $" Bonus {bonusX} on" : "")} {currentMapNamee}.");
                 });
                 return;
             }
 
-            Server.NextFrame(() =>
-            {
-                if (IsAllowedPlayer(player)) player.PrintToChat($"{msgPrefix} Top 10 Records for{(bonusX != 0 ? $" Bonus {bonusX} on" : "")} {currentMapName}:");
-            });
+            List<string> printStatements = [$"{msgPrefix} Top 10 Records for{(bonusX != 0 ? $" Bonus {bonusX} on" : "")} {currentMapNamee}:"];
 
             int rank = 1;
 
             foreach (var kvp in sortedRecords.Take(10))
             {
-                string playerName = kvp.Value.PlayerName!; // Get the player name from the dictionary value
-                int timerTicks = kvp.Value.TimerTicks; // Get the timer ticks from the dictionary value
+                string _playerName = kvp.Value.PlayerName!;
+                int timerTicks = kvp.Value.TimerTicks;
 
                 bool showReplays = false;
                 if (enableReplays == true) showReplays = await CheckSRReplay(kvp.Key);
 
-                Server.NextFrame(() =>
-                {
-                    if (IsAllowedPlayer(player)) player.PrintToChat(msgPrefix + $" #{rank}: {primaryChatColor}{playerName} {ChatColors.White}- {(enableReplays ? $"{(showReplays ? $" {ChatColors.Red}◉" : "")}" : "")}{primaryChatColor}{FormatTime(timerTicks)}");
-                    rank++;
-                });
+                printStatements.Add($"{msgPrefix} #{rank}: {primaryChatColor}{_playerName} {ChatColors.White}- {(enableReplays ? $"{(showReplays ? $" {ChatColors.Red}◉" : "")}" : "")}{primaryChatColor}{FormatTime(timerTicks)}");
+                rank++;
             }
+
+            Server.NextFrame(() =>
+            {
+                if (IsAllowedPlayer(player))
+                {
+                    foreach (var statement in printStatements)
+                    {
+                        player!.PrintToChat(statement);
+                    }
+                }
+            });
         }
 
         [ConsoleCommand("css_rank", "Tells you your rank on this map")]
@@ -574,11 +646,15 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || rankEnabled == false)
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
-            SharpTimerDebug($"{player!.PlayerName} calling css_rank...");
+            var playerName = player!.PlayerName;
+            var playerSlot = player.Slot;
+            var steamID = player.SteamID.ToString();
+
+            SharpTimerDebug($"{playerName} calling css_rank...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -586,7 +662,7 @@ namespace SharpTimer
                 return;
             }
 
-            _ = RankCommandHandler(player, player.SteamID.ToString(), player.Slot, player.PlayerName);
+            _ = Task.Run(async () => await RankCommandHandler(player, steamID, playerSlot, playerName));
         }
 
         public async Task RankCommandHandler(CCSPlayerController? player, string steamId, int playerSlot, string playerName, bool sendRankToHUD = false)
@@ -599,7 +675,7 @@ namespace SharpTimer
                     return;
                 }
 
-                SharpTimerDebug($"Handling !rank for {playerName}...");
+                //SharpTimerDebug($"Handling !rank for {playerName}...");
 
                 string ranking, rankIcon, mapPlacement, serverPoints = "", serverPlacement = "";
                 bool useGlobalRanks = useMySQL && globalRanksEnabled;
@@ -614,11 +690,7 @@ namespace SharpTimer
                     serverPlacement = await GetPlayerServerPlacement(player, steamId, playerName, false, true, false);
                 }
 
-<<<<<<< Updated upstream
-                int pbTicks = useMySQL ? await GetPreviousPlayerRecordFromDatabase(player, steamId, currentMapName, playerName) : GetPreviousPlayerRecord(player);
-=======
-                int pbTicks = useDatabase ? await GetPreviousPlayerRecordFromDatabase(player, steamId, currentMapName!, playerName) : GetPreviousPlayerRecord(player);
->>>>>>> Stashed changes
+                int pbTicks = useMySQL ? await GetPreviousPlayerRecordFromDatabase(player, steamId, currentMapName!, playerName) : GetPreviousPlayerRecord(player, steamId);
 
                 Server.NextFrame(() =>
                 {
@@ -661,11 +733,13 @@ namespace SharpTimer
         {
             if (!IsAllowedPlayer(player) || rankEnabled == false)
             {
-                if(!IsAllowedSpectator(player))
-                     return;
+                if (!IsAllowedSpectator(player))
+                    return;
             }
 
-            SharpTimerDebug($"{player!.PlayerName} calling css_sr...");
+            var playerName = player!.PlayerName;
+
+            SharpTimerDebug($"{playerName} calling css_sr...");
 
             if (playerTimers[player.Slot].TicksSinceLastCmd < cmdCooldown)
             {
@@ -673,17 +747,17 @@ namespace SharpTimer
                 return;
             }
 
-            _ = SRCommandHandler(player);
+            _ = Task.Run(async () => await SRCommandHandler(player, playerName));
         }
 
-        public async Task SRCommandHandler(CCSPlayerController? player)
+        public async Task SRCommandHandler(CCSPlayerController? player, string _playerName)
         {
             if (!IsAllowedPlayer(player) || rankEnabled == false) return;
-            SharpTimerDebug($"Handling !sr for {player!.PlayerName}...");
+            SharpTimerDebug($"Handling !sr for {_playerName}...");
             Dictionary<string, PlayerRecord> sortedRecords;
             if (useMySQL == false)
             {
-                sortedRecords = GetSortedRecords();
+                sortedRecords = await GetSortedRecords();
             }
             else
             {
@@ -698,22 +772,23 @@ namespace SharpTimer
             Server.NextFrame(() =>
             {
                 if (!IsAllowedPlayer(player)) return;
-                player.PrintToChat($"{msgPrefix} Current Server Record on {primaryChatColor}{currentMapName}{ChatColors.White}: ");
+                player!.PrintToChat($"{msgPrefix} Current Server Record on {primaryChatColor}{currentMapName}{ChatColors.White}: ");
             });
 
             foreach (var kvp in sortedRecords.Take(1))
             {
-                string playerName = kvp.Value.PlayerName!; // Get the player name from the dictionary value
-                int timerTicks = kvp.Value.TimerTicks; // Get the timer ticks from the dictionary value
+                string playerName = kvp.Value.PlayerName!;
+                int timerTicks = kvp.Value.TimerTicks;
                 Server.NextFrame(() =>
                 {
                     if (!IsAllowedPlayer(player)) return;
-                    player.PrintToChat(msgPrefix + $" {primaryChatColor}{playerName} {ChatColors.White}- {primaryChatColor}{FormatTime(timerTicks)}");
+                    player!.PrintToChat(msgPrefix + $" {primaryChatColor}{playerName} {ChatColors.White}- {primaryChatColor}{FormatTime(timerTicks)}");
                 });
             }
         }
 
         [ConsoleCommand("css_rb", "Teleports you to Bonus start")]
+        [ConsoleCommand("css_b", "alias for !rb")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
         public void RespawnBonusPlayer(CCSPlayerController? player, CommandInfo command)
         {
@@ -1042,7 +1117,6 @@ namespace SharpTimer
                     playerTimers[player.Slot].IsBonusTimerRunning = false;
                     playerTimers[player.Slot].BonusTimerTicks = 0;
                 });
-                SortedCachedRecords = GetSortedRecords();
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {respawnSound}");
             }
             catch (Exception ex)
@@ -1132,10 +1206,9 @@ namespace SharpTimer
             playerTimers[player.Slot].TimerTicks = 0;
             playerTimers[player.Slot].IsBonusTimerRunning = false;
             playerTimers[player.Slot].BonusTimerTicks = 0;
-            SortedCachedRecords = GetSortedRecords();
 
-            if (stageTriggers.Any()) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
-            if (stageTriggers.Any()) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
+            if (stageTriggers.Count != 0) playerTimers[player.Slot].StageTimes!.Clear(); //remove previous stage times if the map has stages
+            if (stageTriggers.Count != 0) playerTimers[player.Slot].StageVelos!.Clear(); //remove previous stage times if the map has stages
             if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {beepSound}");
             SharpTimerDebug($"{player.PlayerName} css_timer to {playerTimers[player.Slot].IsTimerBlocked}");
         }
@@ -1194,7 +1267,7 @@ namespace SharpTimer
 
             var name = command.GetArg(1);
             bool isPlayerFound = false;
-            CCSPlayerController? foundPlayer = null;
+            CCSPlayerController foundPlayer = null!;
 
 
             foreach (var playerEntry in connectedPlayers.Values)
@@ -1244,8 +1317,9 @@ namespace SharpTimer
         }
 
         [ConsoleCommand("css_cp", "Sets a checkpoint")]
+        [ConsoleCommand("css_saveloc", "alias for !cp")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
-        public void SetPlayerCP(CCSPlayerController? player, CommandInfo command)
+        public void SetPlayerCPCommand(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || cpEnabled == false) return;
             SharpTimerDebug($"{player!.PlayerName} calling css_cp...");
@@ -1262,7 +1336,12 @@ namespace SharpTimer
                 return;
             }
 
-            if (((PlayerFlags)player.Pawn.Value!.Flags & PlayerFlags.FL_ONGROUND) != PlayerFlags.FL_ONGROUND && removeCpRestrictEnabled == false)
+            SetPlayerCP(player, command);
+        }
+
+        public void SetPlayerCP(CCSPlayerController? player, CommandInfo command)
+        {
+            if (((PlayerFlags)player!.Pawn.Value!.Flags & PlayerFlags.FL_ONGROUND) != PlayerFlags.FL_ONGROUND && removeCpRestrictEnabled == false)
             {
                 player.PrintToChat(msgPrefix + $"{ChatColors.LightRed}Cant set {(currentMapName!.Contains("surf_") ? "loc" : "checkpoint")} while in air");
                 if (playerTimers[player.Slot].SoundsEnabled != false) player.ExecuteClientCommand($"play {cpSoundAir}");
@@ -1291,7 +1370,7 @@ namespace SharpTimer
             // Add the current position and rotation strings to the player's checkpoint list
             if (!playerCheckpoints.ContainsKey(player.Slot))
             {
-                playerCheckpoints[player.Slot] = new List<PlayerCheckpoint>();
+                playerCheckpoints[player.Slot] = [];
             }
 
             playerCheckpoints[player.Slot].Add(new PlayerCheckpoint
@@ -1311,8 +1390,9 @@ namespace SharpTimer
         }
 
         [ConsoleCommand("css_tp", "Tp to the most recent checkpoint")]
+        [ConsoleCommand("css_loadloc", "alias for !tp")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
-        public void TpPlayerCP(CCSPlayerController? player, CommandInfo command)
+        public void TpPlayerCPCommand(CCSPlayerController? player, CommandInfo command)
         {
             if (!IsAllowedPlayer(player) || cpEnabled == false) return;
             SharpTimerDebug($"{player!.PlayerName} calling css_tp...");
@@ -1324,6 +1404,17 @@ namespace SharpTimer
             }
 
             if (playerTimers[player.Slot].IsReplaying)
+            {
+                player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
+                return;
+            }
+
+            TpPlayerCP(player, command);
+        }
+
+        public void TpPlayerCP(CCSPlayerController? player, CommandInfo command)
+        {
+            if (playerTimers[player!.Slot].IsReplaying)
             {
                 player.PrintToChat(msgPrefix + $" Please end your current replay first {primaryChatColor}!stopreplay");
                 return;
@@ -1372,6 +1463,7 @@ namespace SharpTimer
         }
 
         [ConsoleCommand("css_prevcp", "Tp to the previous checkpoint")]
+        [ConsoleCommand("css_prevloc", "alias for !prevcp")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
         public void TpPreviousCP(CCSPlayerController? player, CommandInfo command)
         {
@@ -1436,6 +1528,7 @@ namespace SharpTimer
         }
 
         [ConsoleCommand("css_nextcp", "Tp to the next checkpoint")]
+        [ConsoleCommand("css_nextloc", "alias for !nextcp")]
         [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
         public void TpNextCP(CCSPlayerController? player, CommandInfo command)
         {

@@ -25,13 +25,15 @@ namespace SharpTimer
                     return;
                 }
 
-                if (player.PlayerPawn.Value.MovementServices == null)
+                if (player.PlayerPawn.Value!.MovementServices == null)
                 {
                     SharpTimerError("MovementServices is null.");
                     return;
                 }
 
                 int playerSlot = player.Slot;
+                string steamID = player.SteamID.ToString();
+                string playerName = player.PlayerName;
 
                 try
                 {
@@ -49,10 +51,10 @@ namespace SharpTimer
                     playerTimers[playerSlot].SetRespawnPos = null;
                     playerTimers[playerSlot].SetRespawnAng = null;
 
-                    if (isForBot == false) _ = IsPlayerATester(player.SteamID.ToString(), playerSlot);
+                    if (isForBot == false) _ = Task.Run(async () => await IsPlayerATester(steamID, playerSlot));
 
                     //PlayerSettings
-                    if (useMySQL == true && isForBot == false) _ = GetPlayerStats(player, player.SteamID.ToString(), player.PlayerName, playerSlot, true);
+                    if (useMySQL == true && isForBot == false) _ = Task.Run(async () => await GetPlayerStats(player, steamID, playerName, playerSlot, true));
 
                     if (connectMsgEnabled == true && useMySQL == false) Server.PrintToChatAll($"{msgPrefix}Player {ChatColors.Red}{player.PlayerName} {ChatColors.White}connected!");
                     if (cmdJoinMsgEnabled == true && isForBot == false) PrintAllEnabledCommands(player);
@@ -116,7 +118,7 @@ namespace SharpTimer
                     playerCheckpoints[player.Slot] = new List<PlayerCheckpoint>();
                     playerCheckpoints.Remove(player.Slot);
 
-                    specTargets.Remove(player.Pawn.Value.EntityHandle.Index);
+                    specTargets.Remove(player.Pawn.Value!.EntityHandle.Index);
 
                     if (enableReplays)
                     {
@@ -146,9 +148,18 @@ namespace SharpTimer
         private HookResult OnPlayerChatTeam(CCSPlayerController? player, CommandInfo message)
         {
             if (displayChatTags == false) return HookResult.Continue;
-            if (player == null || !player.IsValid || player.IsBot || string.IsNullOrEmpty(message.GetArg(1))) return HookResult.Handled;
+            string msg;
+            if (player == null || !player.IsValid || player.IsBot || string.IsNullOrEmpty(message.GetArg(1)))
+            {
+                return HookResult.Handled;
+            }
+            else
+            {
+                msg = message.GetArg(1);
+            }
 
-            if (message.GetArg(1).StartsWith("!") || message.GetArg(1).StartsWith("/") || message.GetArg(1).StartsWith("."))
+            if (msg.Length > 0 &&
+            (msg[0] == '!' || msg[0] == '/' || msg[0] == '.'))
             {
                 return HookResult.Continue;
             }
@@ -158,7 +169,7 @@ namespace SharpTimer
 
                 if (playerTimers.TryGetValue(player.Slot, out PlayerTimerInfo? value))
                 {
-                    Server.PrintToChatAll($" {primaryChatColor}● {(value.IsVip ? $"{ChatColors.Magenta}[{customVIPTag}] " : "")}{rankColor}[{value.CachedRank}]{ChatColors.Default} {player.PlayerName}: {message.GetArg(1)}");
+                    Server.PrintToChatAll($" {primaryChatColor}● {(value.IsVip ? $"{ChatColors.Magenta}[{customVIPTag}] " : "")}{rankColor}[{value.CachedRank}]{ChatColors.Default} {player.PlayerName}: {msg}");
                 }
                 return HookResult.Handled;
             }
@@ -167,9 +178,18 @@ namespace SharpTimer
         private HookResult OnPlayerChatAll(CCSPlayerController? player, CommandInfo message)
         {
             if (displayChatTags == false) return HookResult.Continue;
-            if (player == null || !player.IsValid || player.IsBot || string.IsNullOrEmpty(message.GetArg(1))) return HookResult.Handled;
+            string msg;
+            if (player == null || !player.IsValid || player.IsBot || string.IsNullOrEmpty(message.GetArg(1)))
+            {
+                return HookResult.Handled;
+            }
+            else
+            {
+                msg = message.GetArg(1);
+            }
 
-            if (message.GetArg(1).StartsWith("!") || message.GetArg(1).StartsWith("/") || message.GetArg(1).StartsWith("."))
+            if (msg.Length > 0 &&
+            (msg[0] == '!' || msg[0] == '/' || msg[0] == '.'))
             {
                 return HookResult.Continue;
             }
@@ -179,7 +199,7 @@ namespace SharpTimer
 
                 if (playerTimers.TryGetValue(player.Slot, out PlayerTimerInfo? value))
                 {
-                    Server.PrintToChatAll($" {ChatColors.Grey}[ALL] {primaryChatColor}● {(value.IsVip ? $"{ChatColors.Magenta}[{customVIPTag}] " : "")}{rankColor}[{value.CachedRank}]{ChatColors.Default} {player.PlayerName}: {message.GetArg(1)}");
+                    Server.PrintToChatAll($" {ChatColors.Grey}[ALL] {primaryChatColor}● {(value.IsVip ? $"{ChatColors.Magenta}[{customVIPTag}] " : "")}{rankColor}[{value.CachedRank}]{ChatColors.Default} {player.PlayerName}: {msg}");
                 }
                 return HookResult.Handled;
             }

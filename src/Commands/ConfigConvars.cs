@@ -8,30 +8,30 @@ namespace SharpTimer
 {
     public partial class SharpTimer
     {
-        [ConsoleCommand("sharptimer_hostname", "Default Server Hostname.")]
-        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
-        public void SharpTimerServerHostname(CCSPlayerController? player, CommandInfo command)
-        {
+        // [ConsoleCommand("sharptimer_hostname", "Default Server Hostname.")]
+        // [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        // public void SharpTimerServerHostname(CCSPlayerController? player, CommandInfo command)
+        // {
 
-            string args = command.ArgString.Trim();
+        //     string args = command.ArgString.Trim();
 
-            if (string.IsNullOrEmpty(args))
-            {
-                defaultServerHostname = $"A SharpTimer Server";
-                return;
-            }
+        //     if (string.IsNullOrEmpty(args))
+        //     {
+        //         defaultServerHostname = $"A SharpTimer Server";
+        //         return;
+        //     }
 
-            defaultServerHostname = $"{args}";
-        }
+        //     defaultServerHostname = $"{args}";
+        // }
 
-        [ConsoleCommand("sharptimer_autoset_mapinfo_hostname_enabled", "Whether Map Name and Map Tier (if available) should be put into the hostname or not. Default value: false")]
-        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
-        public void SharpTimerHostnameConvar(CCSPlayerController? player, CommandInfo command)
-        {
-            string args = command.ArgString;
+        // [ConsoleCommand("sharptimer_autoset_mapinfo_hostname_enabled", "Whether Map Name and Map Tier (if available) should be put into the hostname or not. Default value: false")]
+        // [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        // public void SharpTimerHostnameConvar(CCSPlayerController? player, CommandInfo command)
+        // {
+        //     string args = command.ArgString;
 
-            autosetHostname = bool.TryParse(args, out bool autosetHostnameValue) ? autosetHostnameValue : args != "0" && autosetHostname;
-        }
+        //     autosetHostname = bool.TryParse(args, out bool autosetHostnameValue) ? autosetHostnameValue : args != "0" && autosetHostname;
+        // }
 
         [ConsoleCommand("sharptimer_custom_map_cfgs_enabled", "Whether Custom Map .cfg files should be executed for the corresponding maps (found in cfg/SharpTimer/MapData/MapExecs/kz_example.cfg). Default value: true")]
         [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
@@ -121,20 +121,20 @@ namespace SharpTimer
             enableReplays = bool.TryParse(args, out bool enableReplaysValue) ? enableReplaysValue : args != "0" && enableReplays;
         }
 
-        [ConsoleCommand("sharptimer_replay_max_lenght", "The maximum lenght for a Replay to be saved in seconds. Anything longer will be discarded Default value: 300")]
+        [ConsoleCommand("sharptimer_replay_max_length", "The maximum length for a Replay to be saved in seconds. Anything longer will be discarded Default value: 300")]
         [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
-        public void SharpTimerReplayMaxLenghtConvar(CCSPlayerController? player, CommandInfo command)
+        public void SharpTimerReplayMaxLengthConvar(CCSPlayerController? player, CommandInfo command)
         {
             string args = command.ArgString;
 
-            if (int.TryParse(args, out int mxLenght) && mxLenght > 0)
+            if (int.TryParse(args, out int mxLength) && mxLength > 0)
             {
-                maxReplayFrames = (int)(mxLenght * 64);
-                SharpTimerConPrint($"SharpTimer max replay lenght set to {mxLenght} seconds.");
+                maxReplayFrames = (int)(mxLength * 64);
+                SharpTimerConPrint($"SharpTimer max replay length set to {mxLength} seconds.");
             }
             else
             {
-                SharpTimerConPrint("Invalid max replay lenght value. Please provide a positive int.");
+                SharpTimerConPrint("Invalid max replay length value. Please provide a positive int.");
             }
         }
 
@@ -145,6 +145,21 @@ namespace SharpTimer
             string args = command.ArgString;
 
             enableSRreplayBot = bool.TryParse(args, out bool enableSRreplayBotValue) ? enableSRreplayBotValue : args != "0" && enableSRreplayBot;
+        }
+
+        [ConsoleCommand("sharptimer_vip_gif_host", "URL where VIP gifs are being hosted on. Default: 'https://files.catbox.moe'")]
+        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        public void SharpTimerVipGifHost(CCSPlayerController? player, CommandInfo command)
+        {
+            string args = command.ArgString.Trim();
+
+            if (string.IsNullOrEmpty(args))
+            {
+                vipGifHost = $"https://files.catbox.moe";
+                return;
+            }
+
+            vipGifHost = $"{args}";
         }
 
         [ConsoleCommand("sharptimer_jumpstats_enabled", "Whether JumpStats are enabled or not. Default value: false")]
@@ -316,6 +331,42 @@ namespace SharpTimer
             string args = command.ArgString;
 
             useMySQL = bool.TryParse(args, out bool useMySQLValue) ? useMySQLValue : args != "0" && useMySQL;
+        }
+
+        [ConsoleCommand("sharptimer_discordwebhook_enabled", "Whether player PBs or SRs should be printed into a discord channel or not. Default value: false")]
+        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        public void SharpTimerDiscordWebhookConvar(CCSPlayerController? player, CommandInfo command)
+        {
+            string args = command.ArgString;
+
+            discordWebhookEnabled = bool.TryParse(args, out bool discordWebhookEnabledValue) ? discordWebhookEnabledValue : args != "0" && discordWebhookEnabled;
+        }
+
+        [ConsoleCommand("sharptimer_discordwebhook_print_sr", "Default value: true")]
+        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        public void SharpTimerDiscordWebhookSRConvar(CCSPlayerController? player, CommandInfo command)
+        {
+            string args = command.ArgString;
+
+            discordWebhookPrintSR = bool.TryParse(args, out bool discordWebhookPrintSRValue) ? discordWebhookPrintSRValue : args != "0" && discordWebhookPrintSR;
+        }
+
+        [ConsoleCommand("sharptimer_discordwebhook_print_pb", "Default value: true")]
+        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        public void SharpTimerDiscordWebhookPBConvar(CCSPlayerController? player, CommandInfo command)
+        {
+            string args = command.ArgString;
+
+            discordWebhookPrintPB = bool.TryParse(args, out bool discordWebhookPrintPBValue) ? discordWebhookPrintPBValue : args != "0" && discordWebhookPrintPB;
+        }
+
+        [ConsoleCommand("sharptimer_force_disable_json", "Whether player times should NOT be saved to JSON. Default value: false")]
+        [CommandHelper(whoCanExecute: CommandUsage.SERVER_ONLY)]
+        public void SharpTimerIgnoreJSONConvar(CCSPlayerController? player, CommandInfo command)
+        {
+            string args = command.ArgString;
+
+            ignoreJSON = bool.TryParse(args, out bool ignoreJSONValue) ? ignoreJSONValue : args != "0" && ignoreJSON;
         }
 
         [ConsoleCommand("sharptimer_command_spam_cooldown", "Defines the time between commands can be called. Default value: 1")]
@@ -628,11 +679,11 @@ namespace SharpTimer
 
             if (string.IsNullOrEmpty(args))
             {
-                msgPrefix = $" {ParseColorToSymbol(primaryHUDcolor)} [SharpTimer] {ChatColors.White}";
+                msgPrefix = $" {ChatColors.Green}[SharpTimer] {ChatColors.White}";
                 return;
             }
 
-            msgPrefix = $" {ParseColorToSymbol(primaryHUDcolor)} {args} {ChatColors.White}";
+            msgPrefix = $" {ParsePrefixColors(args)} {ChatColors.White}";
         }
 
         [ConsoleCommand("sharptimer_hud_primary_color", "Primary Color for Timer HUD. Default value: green")]
@@ -709,7 +760,7 @@ namespace SharpTimer
 
             if (string.IsNullOrEmpty(args))
             {
-                remoteBhopDataSource = $"https://mirror.ghproxy.com/https://raw.githubusercontent.com/DEAFPS/SharpTimer/remote_data/bhop_.json";
+                remoteBhopDataSource = $"https://raw.githubusercontent.com/deafps/SharpTimer/remote_data/bhop_.json";
                 return;
             }
 
@@ -725,7 +776,7 @@ namespace SharpTimer
 
             if (string.IsNullOrEmpty(args))
             {
-                remoteBhopDataSource = $"https://mirror.ghproxy.com/https://raw.githubusercontent.com/DEAFPS/SharpTimer/remote_data/kz_.json";
+                remoteBhopDataSource = $"https://raw.githubusercontent.com/deafps/SharpTimer/remote_data/kz_.json";
                 return;
             }
 
@@ -741,7 +792,7 @@ namespace SharpTimer
 
             if (string.IsNullOrEmpty(args))
             {
-                remoteBhopDataSource = $"https://mirror.ghproxy.com/https://raw.githubusercontent.com/DEAFPS/SharpTimer/remote_data/surf_.json";
+                remoteBhopDataSource = $"https://raw.githubusercontent.com/deafps/SharpTimer/remote_data/surf_.json";
                 return;
             }
 

@@ -5,7 +5,7 @@ using CounterStrikeSharp.API.Modules.Cvars;
 
 namespace SharpTimer
 {
-    [MinimumApiVersion(202)]
+    [MinimumApiVersion(228)]
     public partial class SharpTimer : BasePlugin
     {
         public override void Load(bool hotReload)
@@ -13,8 +13,8 @@ namespace SharpTimer
             SharpTimerConPrint("Loading Plugin...");
             CheckForUpdate();
 
-            defaultServerHostname = ConVar.Find("hostname").StringValue;
-            Server.ExecuteCommand($"execifexists SharpTimer/config.cfg");
+            // defaultServerHostname = ConVar.Find("hostname")!.StringValue;
+            // Server.ExecuteCommand($"execifexists SharpTimer/config.cfg");
 
             gameDir = Server.GameDirectory;
             SharpTimerDebug($"Set gameDir to {gameDir}");
@@ -32,11 +32,11 @@ namespace SharpTimer
 
             RegisterEventHandler<EventPlayerConnectFull>((@event, info) =>
             {
-                if (@event.Userid.IsValid)
+                if (@event.Userid!.IsValid)
                 {
                     var player = @event.Userid;
 
-                    if (player.IsValid || !player.IsBot)
+                    if (player.IsValid && !player.IsBot)
                     {
                         OnPlayerConnect(player);
                     }
@@ -46,35 +46,50 @@ namespace SharpTimer
 
             RegisterEventHandler<EventPlayerTeam>((@event, info) =>
             {
-                if (@event.Userid.IsValid)
+                if (@event.Userid!.IsValid)
                 {
-                    var bot = @event.Userid;
+                    if (@event.Userid == null) return HookResult.Continue;
+                    var player = @event.Userid;
 
-                    if (bot.IsValid && bot.IsBot)
+                    if (player.IsValid && player.IsBot)
                     {
                         if (startKickingAllFuckingBotsExceptReplayOneIFuckingHateValveDogshitFuckingCompanySmile)
                         {
                             AddTimer(4.0f, () =>
                             {
-                                Server.ExecuteCommand($"kickid {bot.Slot}");
+                                Server.ExecuteCommand($"kickid {player.Slot}");
                                 SharpTimerDebug($"Kicking unused bot on spawn...");
                             });
                         }
                     }
+                    else if (player.IsValid)
+                    {
+                        Server.NextFrame(() => InvalidateTimer(player));
+                    }
                 }
                 return HookResult.Continue;
-            });
+            }, HookMode.Pre);
 
             RegisterEventHandler<EventRoundStart>((@event, info) =>
             {
-                LoadMapData();
+                var mapName = Server.MapName;
+                LoadMapData(mapName);
                 SharpTimerDebug($"Loading MapData on RoundStart...");
                 return HookResult.Continue;
             });
 
+            RegisterEventHandler<EventRoundEnd>((@event, info) =>
+            {
+                foreach (CCSPlayerController player in connectedPlayers.Values)
+                {
+                    InvalidateTimer(player);
+                }
+                return HookResult.Continue;
+            }, HookMode.Pre);
+
             RegisterEventHandler<EventPlayerSpawned>((@event, info) =>
             {
-                if (@event.Userid.IsValid)
+                if (@event.Userid!.IsValid)
                 {
                     if (@event.Userid == null) return HookResult.Continue;
 
@@ -84,7 +99,7 @@ namespace SharpTimer
                     {
                         return HookResult.Continue;
                     }
-                    else
+                    else if (player.IsValid)
                     {
                         /* if (removeCollisionEnabled == true && player.PlayerPawn != null)
                         {
@@ -94,20 +109,29 @@ namespace SharpTimer
                         specTargets[player.Pawn.Value.EntityHandle.Index] = new CCSPlayerController(player.Handle); */
                         AddTimer(5.0f, () =>
                         {
+                            if (!player.IsValid || player == null || !IsAllowedPlayer(player)) return;
+
                             if (useMySQL && player.DesiredFOV != (uint)playerTimers[player.Slot].PlayerFov)
                             {
                                 SharpTimerDebug($"{player.PlayerName} has wrong PlayerFov {player.DesiredFOV}... SetFov to {(uint)playerTimers[player.Slot].PlayerFov}");
                                 SetFov(player, playerTimers[player.Slot].PlayerFov, true);
                             }
                         });
-                    }
+
+                        Server.NextFrame(() => 
+                        {
+                            Server.ExecuteCommand("sv_cheats 0");
+                            player.Pawn.Value!.MoveType = MoveType_t.MOVETYPE_WALK;
+                            InvalidateTimer(player);
+                        });
+					}
                 }
                 return HookResult.Continue;
-            });
+            }, HookMode.Pre);
 
             RegisterEventHandler<EventPlayerDisconnect>((@event, info) =>
             {
-                if (@event.Userid.IsValid)
+                if (@event.Userid!.IsValid)
                 {
                     var player = @event.Userid;
 
@@ -125,7 +149,7 @@ namespace SharpTimer
 
             RegisterEventHandler<EventPlayerJump>((@event, info) =>
             {
-                if (@event.Userid.IsValid)
+                if (@event.Userid!.IsValid)
                 {
                     var player = @event.Userid;
 
@@ -143,7 +167,7 @@ namespace SharpTimer
 
             RegisterEventHandler<EventPlayerSound>((@event, info) =>
             {
-                if (@event.Userid.IsValid)
+                if (@event.Userid!.IsValid)
                 {
                     var player = @event.Userid;
 
@@ -163,25 +187,31 @@ namespace SharpTimer
 
             HookEntityOutput("trigger_multiple", "OnStartTouch", (CEntityIOOutput output, string name, CEntityInstance activator, CEntityInstance caller, CVariant value, float delay) =>
             {
-                TriggerMultipleOnStartTouch(output, activator, caller, value);
+                TriggerMultipleOnStartTouch(activator, caller);
                 return HookResult.Continue;
             });
 
             HookEntityOutput("trigger_multiple", "OnEndTouch", (CEntityIOOutput output, string name, CEntityInstance activator, CEntityInstance caller, CVariant value, float delay) =>
             {
-                TriggerMultipleOnEndTouch(output, activator, caller, value);
+                TriggerMultipleOnEndTouch(activator, caller);
                 return HookResult.Continue;
             });
 
             HookEntityOutput("trigger_teleport", "OnEndTouch", (CEntityIOOutput output, string name, CEntityInstance activator, CEntityInstance caller, CVariant value, float delay) =>
             {
-                TriggerTeleportOnEndTouch(output, activator, caller, value);
+                TriggerTeleportOnEndTouch(activator, caller);
                 return HookResult.Continue;
             });
 
             HookEntityOutput("trigger_teleport", "OnStartTouch", (CEntityIOOutput output, string name, CEntityInstance activator, CEntityInstance caller, CVariant value, float delay) =>
             {
-                TriggerTeleportOnStartTouch(output, activator, caller, value);
+                TriggerTeleportOnStartTouch(activator, caller);
+                return HookResult.Continue;
+            });
+
+            HookEntityOutput("trigger_push", "OnStartTouch", (CEntityIOOutput output, string name, CEntityInstance activator, CEntityInstance caller, CVariant value, float delay) =>
+            {
+                TriggerPushOnStartTouch(activator, caller);
                 return HookResult.Continue;
             });
 
@@ -192,6 +222,7 @@ namespace SharpTimer
 
             AddCommandListener("say", OnPlayerChatAll);
             AddCommandListener("say_team", OnPlayerChatTeam);
+            AddCommandListener("jointeam", OnCommandJoinTeam);
 
             SharpTimerConPrint("Plugin Loaded");
         }
@@ -199,10 +230,9 @@ namespace SharpTimer
         public override void Unload(bool hotReload)
         {
             DamageUnHook();
-
             RemoveCommandListener("say", OnPlayerChatAll, HookMode.Pre);
             RemoveCommandListener("say_team", OnPlayerChatTeam, HookMode.Pre);
-
+            RemoveCommandListener("jointeam", OnCommandJoinTeam, HookMode.Pre);
             SharpTimerConPrint("Plugin Unloaded");
         }
     }
